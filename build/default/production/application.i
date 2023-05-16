@@ -4661,11 +4661,15 @@ typedef union {
 
 
 
+
+
 int main() {
     ((*(volatile uint8_t *)(0xF94))) = 0x00;
     ((volatile SELF_LATC *)0XF8B)->LATC_REGISTER = 0x55;
     _delay((unsigned long)((2000)*(4000000UL/4000.0)));
     ((volatile SELF_LATC *)0XF8B)->SELF_LATC1 = 0x1;
+    _delay((unsigned long)((2000)*(4000000UL/4000.0)));
+    (*((volatile SELF_LATC *)0XF8B)).SELF_LATC3 = 0x1;
     while(1)
     {
     }

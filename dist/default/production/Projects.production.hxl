@@ -10,11 +10,11 @@
 ### Memory Usage ###
  Intel Hex-file ranges:
   0h - 3h		(dist/default/production\Projects.production.hex)
-  FFD2h - FFFFh		(dist/default/production\Projects.production.hex)
+  FFBAh - FFFFh		(dist/default/production\Projects.production.hex)
   200000h - 200007h		(dist/default/production\Projects.production.hex)
   300000h - 30000Dh		(dist/default/production\Projects.production.hex)
  Unused ranges:
-  4h - FFD1h
+  4h - FFB9h
   10000h - 1FFFFFh
   200008h - 2FFFFFh
 
@@ -27,7 +27,9 @@
 ----------------------------------------------------------
 00000000 | H1 H1 H1 H1 -- -- -- -- -- -- -- -- -- -- -- --
 ----------------------------------------------------------
-0000FFD0 | -- -- H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1
+0000FFB0 | -- -- -- -- -- -- -- -- -- -- H1 H1 H1 H1 H1 H1
+0000FFC0 | H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1
+0000FFD0 | H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1
 0000FFE0 | H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1
 0000FFF0 | H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1 H1
 ----------------------------------------------------------

@@ -287,41 +287,47 @@ Version 4.0 HI-TECH Software Intermediate Code
 "6716
 [; <" TOSU equ 0FFFh ;# ">
 [v $root$_main `(v ~T0 @X0 0 e ]
-"41 application.c
-[; ;application.c: 41: int main() {
+"43 application.c
+[; ;application.c: 43: int main() {
 [v _main `(i ~T0 @X0 1 ef ]
 {
 [e :U _main ]
 [f ]
-"42
-[; ;application.c: 42:     ((*(volatile uint8_t *)(0xF94))) = 0x00;
-[e = *U -> -> 3988 `i `*Vuc -> -> 0 `i `uc ]
-"43
-[; ;application.c: 43:     ((volatile SELF_LATC *)0XF8B)->LATC_REGISTER = 0x55;
-[e = . *U -> -> 3979 `i `*VS272 1 -> -> 85 `i `uc ]
 "44
-[; ;application.c: 44:     _delay((unsigned long)((2000)*(4000000UL/4000.0)));
-[e ( __delay (1 -> * -> -> 2000 `i `d / -> -> 4000000 `ul `d .4000.0 `ul ]
+[; ;application.c: 44:     ((*(volatile uint8_t *)(0xF94))) = 0x00;
+[e = *U -> -> 3988 `i `*Vuc -> -> 0 `i `uc ]
 "45
-[; ;application.c: 45:     ((volatile SELF_LATC *)0XF8B)->SELF_LATC1 = 0x1;
-[e = . . *U -> -> 3979 `i `*VS272 0 1 -> -> 1 `i `uc ]
+[; ;application.c: 45:     ((volatile SELF_LATC *)0XF8B)->LATC_REGISTER = 0x55;
+[e = . *U -> -> 3979 `i `*VS272 1 -> -> 85 `i `uc ]
 "46
-[; ;application.c: 46:     while(1)
-[e :U 276 ]
+[; ;application.c: 46:     _delay((unsigned long)((2000)*(4000000UL/4000.0)));
+[e ( __delay (1 -> * -> -> 2000 `i `d / -> -> 4000000 `ul `d .4000.0 `ul ]
 "47
-[; ;application.c: 47:     {
-{
+[; ;application.c: 47:     ((volatile SELF_LATC *)0XF8B)->SELF_LATC1 = 0x1;
+[e = . . *U -> -> 3979 `i `*VS272 0 1 -> -> 1 `i `uc ]
 "48
-[; ;application.c: 48:     }
+[; ;application.c: 48:     _delay((unsigned long)((2000)*(4000000UL/4000.0)));
+[e ( __delay (1 -> * -> -> 2000 `i `d / -> -> 4000000 `ul `d .4000.0 `ul ]
+"49
+[; ;application.c: 49:     (*((volatile SELF_LATC *)0XF8B)).SELF_LATC3 = 0x1;
+[e = . . *U -> -> 3979 `i `*VS272 0 3 -> -> 1 `i `uc ]
+"50
+[; ;application.c: 50:     while(1)
+[e :U 276 ]
+"51
+[; ;application.c: 51:     {
+{
+"52
+[; ;application.c: 52:     }
 }
 [e :U 275 ]
 [e $U 276  ]
 [e :U 277 ]
-"50
-[; ;application.c: 50:     return (0);
+"54
+[; ;application.c: 54:     return (0);
 [e ) -> 0 `i ]
 [e $UE 274  ]
-"51
-[; ;application.c: 51: }
+"55
+[; ;application.c: 55: }
 [e :UE 274 ]
 }
