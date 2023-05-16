@@ -34,7 +34,9 @@ typedef union {
     uint8_t LATC_REGISTER;
 }SELF_LATC;
 
-#define SELF_LATC_REG ((volatile SELF_LATC *)0XF8B)
+#define SELF_LATC_REG              ((volatile SELF_LATC *)0XF8B)
+#define DEREFERENCED_SELF_LATC_REG (*((volatile SELF_LATC *)0XF8B))
+
 /*
  * 
  */
@@ -43,6 +45,8 @@ int main() {
     SELF_LATC_REG->LATC_REGISTER = 0x55;
     __delay_ms(2000);
     SELF_LATC_REG->SELF_LATC1 = 0x1;
+    __delay_ms(2000);
+    DEREFERENCED_SELF_LATC_REG.SELF_LATC3 = 0x1;
     while(1)
     {
     }
