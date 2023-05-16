@@ -8,7 +8,16 @@
 #ifndef APPLICATION_H
 #define	APPLICATION_H
 
+/* Section : Includes */
 #include "ECU_Layer/LED/ecu_led.h"
+
+/* Section : Macro Declarations */
+
+/* Section : Macro Functions Declarations */
+
+/* Section : Data-Type Declarations */
+
+/* Section : Function Declarations */
 
 #endif	/* APPLICATION_H */
 
