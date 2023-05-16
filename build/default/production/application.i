@@ -4642,19 +4642,30 @@ unsigned char __t3rd16on(void);
 # 11 "./ECU_Layer/LED/ecu_led.h" 2
 # 11 "./application.h" 2
 # 9 "application.c" 2
-# 24 "application.c"
+# 23 "application.c"
+typedef union {
+    struct{
+        unsigned SELF_LATC0 : 1;
+        unsigned SELF_LATC1 : 1;
+        unsigned SELF_LATC2 : 1;
+        unsigned SELF_LATC3 : 1;
+        unsigned SELF_LATC4 : 1;
+        unsigned SELF_LATC5 : 1;
+        unsigned SELF_LATC6 : 1;
+        unsigned SELF_LATC7 : 1;
+    };
+    uint8_t LATC_REGISTER;
+}SELF_LATC;
+
+
+
+
+
 int main() {
     ((*(volatile uint8_t *)(0xF94))) = 0x00;
-    ((*(volatile uint8_t *)(0xF8B))) = 0x55;
+    ((volatile SELF_LATC *)0XF8B)->LATC_REGISTER = 0x55;
     _delay((unsigned long)((2000)*(4000000UL/4000.0)));
-
-    (((*(volatile uint8_t *)(0xF8B))) |= (1 << 0x1));
-    _delay((unsigned long)((1000)*(4000000UL/4000.0)));
-
-    (((*(volatile uint8_t *)(0xF8B))) &= ~(1 << 0x1));
-    _delay((unsigned long)((1000)*(4000000UL/4000.0)));
-
-    (((*(volatile uint8_t *)(0xF8B))) ^= (1 << 0x1));
+    ((volatile SELF_LATC *)0XF8B)->SELF_LATC1 = 0x1;
     while(1)
     {
     }
