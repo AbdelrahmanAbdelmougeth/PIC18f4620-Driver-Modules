@@ -18,21 +18,31 @@
 #define SET_BIT(REG_ADDR,BIT_POSN)     (REG_ADDR |= (1 << BIT_POSN))
 #define CLEAR_BIT(REG_ADDR,BIT_POSN)   (REG_ADDR &= ~(1 << BIT_POSN))
 #define TOGGLE_BIT(REG_ADDR,BIT_POSN)  (REG_ADDR ^= (1 << BIT_POSN))
+
+
+typedef union {
+    struct{
+        unsigned SELF_LATC0 : 1;
+        unsigned SELF_LATC1 : 1;
+        unsigned SELF_LATC2 : 1;
+        unsigned SELF_LATC3 : 1;
+        unsigned SELF_LATC4 : 1;
+        unsigned SELF_LATC5 : 1;
+        unsigned SELF_LATC6 : 1;
+        unsigned SELF_LATC7 : 1;
+    };
+    uint8_t LATC_REGISTER;
+}SELF_LATC;
+
+#define SELF_LATC_REG ((volatile SELF_LATC *)0XF8B)
 /*
  * 
  */
 int main() {
     ABDO_TRISC = 0x00; //set port c as output
-    ABDO_LATC = 0x55; //write 0x55 to output pin
+    SELF_LATC_REG->LATC_REGISTER = 0x55;
     __delay_ms(2000);
-    //ABDO_LATC |= (1 << _LATC_LATC1_POSN); //set bit
-    SET_BIT(ABDO_LATC, _LATC_LATC1_POSN);
-    __delay_ms(1000);
-    //ABDO_LATC &= ~(1 << _LATC_LATC1_POSN); //clear bit
-    CLEAR_BIT(ABDO_LATC, _LATC_LATC1_POSN);
-    __delay_ms(1000);
-    //ABDO_LATC ^= (1 << _LATC_LATC1_POSN); //clear bit
-    TOGGLE_BIT(ABDO_LATC, _LATC_LATC1_POSN);
+    SELF_LATC_REG->SELF_LATC1 = 0x1;
     while(1)
     {
     }
