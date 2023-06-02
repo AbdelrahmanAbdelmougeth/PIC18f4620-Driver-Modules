@@ -15,36 +15,39 @@
 
 /* Section : Macro Declarations */
 #define BIT_MASK (uint8)1
+#define PORT_PIN_MAX_NUMBER 8
+#define PORT_MAX_NUMBER 5
+
 
 /* Section : Macro Functions Declarations */
-#define HWREG8(REG_ADDR)   (*(volatile uint8 *(REG_ADDR)))
+#define HWREG8(REG_ADDR)   (*((volatile uint8 *)(REG_ADDR)))
 
-#define SET_BIT   (REG, BIT_POSN) (REG |=  (BIT_MASK << BIT_POSN))
-#define CLEAR_BIT (REG, BIT_POSN) (REG &= ~(BIT_MASK << BIT_POSN))
-#define TOGGLE_BIT(REG, BIT_POSN) (REG ^=  (BIT_MASK << BIT_POSN))
-#define READ_BIT  (REG, BIT_POSN) ((REG >> BIT_POSN) & BIT_MASK)
+#define SET_BIT(REG, BIT_POSN)      (REG |=  (BIT_MASK << BIT_POSN))
+#define CLEAR_BIT(REG, BIT_POSN)    (REG &= ~(BIT_MASK << BIT_POSN))
+#define TOGGLE_BIT(REG, BIT_POSN)   (REG ^=  (BIT_MASK << BIT_POSN))
+#define READ_BIT(REG, BIT_POSN)     ((REG >> BIT_POSN) & BIT_MASK)
 
 
 /* Section : Data-Type Declarations */
 typedef enum{
-    LOW = 0,
-    HIGH        
+    GPIO_LOW = 0,
+    GPIO_HIGH        
 }logic_t;
 
 typedef enum{
-    OUTPUT =0,
-    INPUT        
+    GPIO_DIRECTION_OUTPUT =0,
+    GPIO_DIRECTION_INPUT        
 }direction_t;
 
 typedef enum{
-    PIN0 =0,
-    PIN1,
-    PIN2,
-    PIN3,
-    PIN4, 
-    PIN5,
-    PIN6,
-    PIN7
+    GPIO_PIN0 =0,
+    GPIO_PIN1,
+    GPIO_PIN2,
+    GPIO_PIN3,
+    GPIO_PIN4, 
+    GPIO_PIN5,
+    GPIO_PIN6,
+    GPIO_PIN7
 }pin_index_t;
 
 
@@ -58,10 +61,10 @@ typedef enum{
 
 
 typedef struct{
-    uint8 port :3;
-    uint8 pin :3;
-    uint8 direction: 1;
-    uint8 logic : 1;
+    uint8 port :3;      /*@ref port_index_t*/
+    uint8 pin :3;       /*@ref pin_index_t*/
+    uint8 direction: 1; /*@ref direction_t*/
+    uint8 logic : 1;    /*@ref logic_t*/
 }pin_config_t;
 
 
@@ -72,7 +75,7 @@ Std_ReturnType gpio_pin_write_logic(const pin_config_t* _pin_config, logic_t log
 Std_ReturnType gpio_pin_read_logic(const pin_config_t* _pin_config, logic_t* logic);
 Std_ReturnType gpio_toggle_logic(const pin_config_t* _pin_config);
 
-Std_ReturnType gpio_port_direction_initialize(const port_index_t port);
+Std_ReturnType gpio_port_direction_initialize(const port_index_t port, uint8 direction);
 Std_ReturnType gpio_port_get_direction_status(const port_index_t port, uint8* direction_status);
 Std_ReturnType gpio_port_write_logic(const port_index_t port, uint8 logic);
 Std_ReturnType gpio_port_read_logic(const port_index_t port, uint8* logic);

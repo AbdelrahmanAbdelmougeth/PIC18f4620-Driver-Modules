@@ -11,6 +11,7 @@
 /* Section : Includes */
 
 /* Section : Macro Declarations */
+#define _XTAL_FREQ 4000000UL
 
 /* Section : Macro Functions Declarations */
 
