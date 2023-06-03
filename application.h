@@ -19,6 +19,7 @@
 /* Section : Data-Type Declarations */
 
 /* Section : Function Declarations */
+void application_initialize();
 
 #endif	/* APPLICATION_H */
 

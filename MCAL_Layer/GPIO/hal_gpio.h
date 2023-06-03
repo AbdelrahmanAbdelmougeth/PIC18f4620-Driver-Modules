@@ -19,8 +19,7 @@
 #define PORT_PIN_MAX_NUMBER   8
 #define PORT_MAX_NUMBER       5
 
-#define GPIO_PORT_PIN_CONFIGURATIONS  CONFIG_ENABLE 
-#define GPIO_PORT_CONFIGURATIONS      CONFIG_ENABLE 
+#define PORT_MASK            0xFF
 
 /* Section : Macro Functions Declarations */
 #define HWREG8(REG_ADDR)   (*((volatile uint8 *)(REG_ADDR)))

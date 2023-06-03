@@ -16,9 +16,11 @@ volatile uint8 *port_registers[] = {&PORTA, &PORTB, &PORTC, &PORTD, &PORTE};
 
 
 /**
- * 
- * @param _pin_config
- * @return 
+ * @brief initialize the direction of a specific pin @ref direction_t
+ * @param _pin_config : Pointer to the pin configurations @ref pin_config_t
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue          
  */
 #if GPIO_PORT_PIN_CONFIGURATIONS==CONFIG_ENABLE
 Std_ReturnType gpio_pin_direction_initialize(const pin_config_t* _pin_config){
@@ -45,9 +47,11 @@ Std_ReturnType gpio_pin_direction_initialize(const pin_config_t* _pin_config){
 
 /**
  * 
- * @param _pin_config
+ * @param _pin_config : Pointer to the pin configurations @ref pin_config_t
  * @param direction_status
- * @return 
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue
  */
 #if GPIO_PORT_PIN_CONFIGURATIONS==CONFIG_ENABLE
 Std_ReturnType gpio_pin_get_direction_status(const pin_config_t* _pin_config, direction_t* direction_status){
@@ -64,9 +68,11 @@ Std_ReturnType gpio_pin_get_direction_status(const pin_config_t* _pin_config, di
 
 /**
  * 
- * @param _pin_config
+ * @param _pin_config : Pointer to the pin configurations @ref pin_config_t
  * @param logic
- * @return 
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue
  */
 #if GPIO_PORT_PIN_CONFIGURATIONS==CONFIG_ENABLE
 Std_ReturnType gpio_pin_write_logic(const pin_config_t* _pin_config, logic_t logic){
@@ -91,9 +97,11 @@ Std_ReturnType gpio_pin_write_logic(const pin_config_t* _pin_config, logic_t log
 
 /**
  * 
- * @param _pin_config
+ * @param _pin_config : Pointer to the pin configurations @ref pin_config_t
  * @param logic
- * @return 
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue
  */
 #if GPIO_PORT_PIN_CONFIGURATIONS==CONFIG_ENABLE
 Std_ReturnType gpio_pin_read_logic(const pin_config_t* _pin_config, logic_t* logic){
@@ -111,8 +119,10 @@ Std_ReturnType gpio_pin_read_logic(const pin_config_t* _pin_config, logic_t* log
 
 /**
  * 
- * @param _pin_config
- * @return 
+ * @param _pin_config : Pointer to the pin configurations @ref pin_config_t
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue
  */
 #if GPIO_PORT_PIN_CONFIGURATIONS==CONFIG_ENABLE
 Std_ReturnType gpio_pin_initialize(const pin_config_t* _pin_config){
@@ -130,8 +140,10 @@ Std_ReturnType gpio_pin_initialize(const pin_config_t* _pin_config){
 
 /**
  * 
- * @param _pin_config
- * @return 
+ * @param _pin_config : Pointer to the pin configurations @ref pin_config_t
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue
  */
 #if GPIO_PORT_PIN_CONFIGURATIONS==CONFIG_ENABLE
 Std_ReturnType gpio_pin_toggle_logic(const pin_config_t* _pin_config){
@@ -140,7 +152,7 @@ Std_ReturnType gpio_pin_toggle_logic(const pin_config_t* _pin_config){
     {
         ret = E_NOT_OK;
     }else {
-    
+        TOGGLE_BIT(*lat_registers[_pin_config->port], _pin_config->pin);
     }  
     return ret;
 }
@@ -150,12 +162,18 @@ Std_ReturnType gpio_pin_toggle_logic(const pin_config_t* _pin_config){
  * 
  * @param port
  * @param direction
- * @return 
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue
  */
 #if GPIO_PORT_CONFIGURATIONS==CONFIG_ENABLE
 Std_ReturnType gpio_port_direction_initialize(const port_index_t port, uint8 direction){
     Std_ReturnType ret= E_OK;
- 
+    if(port > PORT_MAX_NUMBER - 1){
+        ret = E_NOT_OK;
+    }else{
+        *tris_registers[port] = direction;
+    }
     return ret;
 }
 #endif
@@ -164,16 +182,18 @@ Std_ReturnType gpio_port_direction_initialize(const port_index_t port, uint8 dir
  * 
  * @param port
  * @param direction_status
- * @return 
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue
  */
 #if GPIO_PORT_CONFIGURATIONS==CONFIG_ENABLE
 Std_ReturnType gpio_port_get_direction_status(const port_index_t port, uint8* direction_status){
     Std_ReturnType ret= E_OK;
-    if(direction_status == NULL)
+    if(direction_status == NULL || port > PORT_MAX_NUMBER - 1)
     {
         ret = E_NOT_OK;
     }else {
-    
+        *direction_status = *tris_registers[port];
     }  
     return ret;
 }
@@ -183,30 +203,18 @@ Std_ReturnType gpio_port_get_direction_status(const port_index_t port, uint8* di
  * 
  * @param port
  * @param logic
- * @return 
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue
  */
 #if GPIO_PORT_CONFIGURATIONS==CONFIG_ENABLE
 Std_ReturnType gpio_port_write_logic(const port_index_t port, uint8 logic){
     Std_ReturnType ret= E_OK;
- 
-    return ret;
-}
-#endif
-
-/**
- * 
- * @param port
- * @param logic
- * @return 
- */
-#if GPIO_PORT_CONFIGURATIONS==CONFIG_ENABLE
-Std_ReturnType gpio_port_read_logic(const port_index_t port, uint8* logic){
-    Std_ReturnType ret= E_OK;
-     if(logic == NULL)
+    if(port > PORT_MAX_NUMBER - 1)
     {
         ret = E_NOT_OK;
     }else {
-    
+        *lat_registers[port] = logic;
     }  
     return ret;
 }
@@ -215,12 +223,38 @@ Std_ReturnType gpio_port_read_logic(const port_index_t port, uint8* logic){
 /**
  * 
  * @param port
- * @return 
+ * @param logic
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue
+ */
+#if GPIO_PORT_CONFIGURATIONS==CONFIG_ENABLE
+Std_ReturnType gpio_port_read_logic(const port_index_t port, uint8* logic){
+    Std_ReturnType ret= E_OK;
+    if(logic == NULL || port > PORT_MAX_NUMBER - 1)
+    {
+        ret = E_NOT_OK;
+    }else{
+        *logic = *port_registers[port];
+    }  
+    return ret;
+}
+#endif
+
+/**
+ * 
+ * @param port
+ * @return status of the function
+ *         (E_OK) : The Function finished successfully
+ *         (E_NOT_OK) : The Function has an issue
  */
 #if GPIO_PORT_CONFIGURATIONS==CONFIG_ENABLE
 Std_ReturnType gpio_port_toggle_logic(const port_index_t port){
     Std_ReturnType ret= E_OK;
- 
+    if(port > PORT_MAX_NUMBER - 1){
+    }else{
+        *lat_registers[port] ^= PORT_MASK; 
+    }
     return ret;
 }
 #endif
