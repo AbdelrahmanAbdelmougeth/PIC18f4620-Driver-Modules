@@ -20,6 +20,9 @@
 
 /* Section : Function Declarations */
 void application_initialize();
+void clock_signal(void);
+void latch_enable(void);
+void send_data(uint8 data_out);
 
 #endif	/* APPLICATION_H */
 

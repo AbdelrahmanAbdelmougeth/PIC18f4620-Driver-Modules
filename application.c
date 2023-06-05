@@ -8,84 +8,120 @@
 
 #include "application.h"
 
-
-pin_config_t led_1 = {
-    .port = PORTC_INDEX,
+led_t led_1 = {
+    .port_name = PORTC_INDEX,
     .pin = GPIO_PIN0,
-    .direction = GPIO_DIRECTION_OUTPUT,
-    .logic = GPIO_LOW
+    .led_status = GPIO_LOW
 };
 
-pin_config_t led_2 = {
-    .port = PORTC_INDEX,
+led_t led_2 = {
+    .port_name = PORTC_INDEX,
     .pin = GPIO_PIN1,
-    .direction = GPIO_DIRECTION_OUTPUT,
-    .logic = GPIO_LOW
+    .led_status = GPIO_LOW
 };
 
-pin_config_t led_3 = {
-    .port = PORTC_INDEX,
+led_t led_3 = {
+    .port_name = PORTC_INDEX,
     .pin = GPIO_PIN2,
-    .direction = GPIO_DIRECTION_OUTPUT,
-    .logic = GPIO_LOW
+    .led_status = GPIO_LOW
 };
 
-pin_config_t btn_1 = {
-    .port = PORTD_INDEX,
+////////////////////////////////////
+led_t clock_pin = {
+    .port_name = PORTA_INDEX,
+    .pin = GPIO_PIN2,
+    .led_status = GPIO_LOW
+};
+led_t latch_enable_pin = {
+    .port_name = PORTA_INDEX,
     .pin = GPIO_PIN0,
-    .direction = GPIO_DIRECTION_INPUT,
-    .logic = GPIO_LOW
+    .led_status = GPIO_LOW
 };
-
-Std_ReturnType ret = E_NOT_OK;
-logic_t btn_1_logic; 
-uint8 portc_direction_status;
-uint8 portc_logic_status;
+led_t data_pin = {
+    .port_name = PORTA_INDEX,
+    .pin = GPIO_PIN1,
+    .led_status = GPIO_LOW
+};
 
 int main() {
     application_initialize();
+    
+    gpio_port_direction_initialize(PORTA_INDEX, GPIO_DIRECTION_OUTPUT);
+    
+    
     while(1)
     {
         /*
-        ret = gpio_pin_write_logic(&led_2, GPIO_HIGH);
-        ret = gpio_pin_write_logic(&led_3, GPIO_HIGH);
-        __delay_ms(150);
-        ret = gpio_pin_write_logic(&led_2, GPIO_LOW);
-        ret = gpio_pin_write_logic(&led_3, GPIO_LOW);
-        __delay_ms(150);
-         */
-         
-        /*ret = gpio_pin_toggle_logic(&led_2);
-        ret = gpio_pin_toggle_logic(&led_3);
-        __delay_ms(150);
+        led_turn_on(&led_1);
+        __delay_ms(50);
+        led_turn_off(&led_1);
+        led_turn_on(&led_2);
+        __delay_ms(50);
+        led_turn_off(&led_2);
+        led_turn_on(&led_3);
+        __delay_ms(50);
+        led_turn_off(&led_3);
         
-        ret = gpio_pin_read_logic(&btn_1, &btn_1_logic);
-        if(btn_1_logic == GPIO_HIGH)
-        {
-           ret = gpio_pin_write_logic(&led_1, GPIO_HIGH);
-        }
-        else
-        {
-           ret = gpio_pin_write_logic(&led_1, GPIO_LOW);
-        }
-         */
-        ret = gpio_port_toggle_logic(PORTC_INDEX);
-        __delay_ms(250);
+        */
+        
+        send_data(0b00000000);
+        __delay_ms(200);
+        send_data(0b10000000);
+        __delay_ms(200);
+        send_data(0b01000000);
+        __delay_ms(200);
+        send_data(0b00100000);
+        __delay_ms(200);
+        send_data(0b00010000);
+        __delay_ms(200);
+        send_data(0b00001000);
+        __delay_ms(200);
+        send_data(0b00000100);
+        __delay_ms(200);
+        send_data(0b00000010);
+        __delay_ms(200);
+        send_data(0b00000001);
+        __delay_ms(200);
+        
     }
 
     return (EXIT_SUCCESS);
 }
 
 void application_initialize(){
-    //ret = gpio_pin_initialize(&led_1);
-    //ret = gpio_pin_initialize(&led_2);
-    //ret = gpio_pin_initialize(&led_3);
-    ret = gpio_port_direction_initialize(PORTC_INDEX, 0x00);
-    ret = gpio_port_get_direction_status(PORTC_INDEX, &portc_direction_status);
+    Std_ReturnType ret = E_NOT_OK;
+    ret = led_initialize(&led_1);
+    ret = led_initialize(&led_2);
+    ret = led_initialize(&led_3);
     
-    ret = gpio_port_write_logic(PORTC_INDEX, 0x55);
-    ret = gpio_port_read_logic(PORTC_INDEX, &portc_logic_status);
-    __delay_ms(5000);
-    ret = gpio_port_write_logic(PORTC_INDEX, 0xAA);
-    ret = gpio_port_read_logic(PORTC_INDEX, &portc_logic_status);
+    ret = led_initialize(&clock_pin);
+    ret = led_initialize(&latch_enable_pin);
+    ret = led_initialize(&data_pin);
+}
+
+void clock_signal(void){
+   led_turn_on(&clock_pin);
+   __delay_us(500);
+   led_turn_off(&clock_pin);
+   __delay_us(500);
+}
+
+void latch_enable(void){
+   led_turn_on(&latch_enable_pin);
+   __delay_us(500);
+   led_turn_off(&latch_enable_pin);
+}
+
+void send_data(uint8 data_out){
+    for (uint8 i=0 ; i<8 ; i++)
+    {
+        if(((data_out >> i) & (0x01)) == 0x01){
+            led_turn_on(&data_pin);
+            clock_signal();
+        }else{
+            led_turn_off(&data_pin);
+            clock_signal();
+        }
+    }
+    latch_enable(); // Data finally submitted
 }
