@@ -17,15 +17,6 @@ button_t btn_high = {
     .button_state = BUTTON_RELEASED
 };
 
-button_t btn_low = {
-    .button_pin.port = PORTD_INDEX,
-    .button_pin.pin = GPIO_PIN0,
-    .button_pin.direction = GPIO_DIRECTION_INPUT,
-    .button_pin.logic = GPIO_HIGH,
-    .button_connection = BUTTON_ACTIVE_LOW,
-    .button_state = BUTTON_RELEASED
-};
-
 led_t led_1 = {
     .port_name = PORTC_INDEX,
     .pin = GPIO_PIN0,
@@ -39,7 +30,9 @@ led_t led_2 = {
 };
 
 button_state_t btn_high_status = BUTTON_RELEASED;
-button_state_t btn_low_status = BUTTON_RELEASED;
+button_state_t btn_high_valid_status = BUTTON_RELEASED;
+button_state_t btn_high_last_valid_status = BUTTON_RELEASED;
+uint32 btn_high_valid = 0;
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
@@ -50,20 +43,25 @@ int main() {
     while(1)
     {
         ret = button_read_state(&btn_high, &btn_high_status);
-        ret = button_read_state(&btn_low, &btn_low_status);
-        
+            
         if(btn_high_status == BUTTON_PRESSED){
-            ret = led_turn_on(&led_1);
+            btn_high_valid++;
+            if(btn_high_valid > 500)
+                btn_high_valid_status = BUTTON_PRESSED;
         }else{
-            ret = led_turn_off(&led_1);
+            btn_high_valid = 0;
+            btn_high_valid_status = BUTTON_RELEASED;
         }
         
-        if(btn_low_status == BUTTON_PRESSED){
-            ret = led_turn_on(&led_2);
-        }else{
-            ret = led_turn_off(&led_2);
+        if(btn_high_valid_status != btn_high_last_valid_status){
+            btn_high_last_valid_status = btn_high_valid_status;
+            if(btn_high_valid_status == BUTTON_PRESSED)
+                ret = led_toggle(&led_1);
         }
+        
+
     }
+    
 
     return (EXIT_SUCCESS);
 }
@@ -71,7 +69,6 @@ int main() {
 void application_initialize(){
     Std_ReturnType ret = E_NOT_OK;
     ret = button_initialize(&btn_high);
-    ret = button_initialize(&btn_low);
     ret = led_initialize(&led_1);
     ret = led_initialize(&led_2);
 }
