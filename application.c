@@ -19,7 +19,6 @@ int main() {
 
     application_initialize();
 
-    
     while (1) {
         relay_toggle(&relay_1);
         __delay_ms(5000);
