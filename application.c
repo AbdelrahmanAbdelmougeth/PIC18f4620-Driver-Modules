@@ -8,29 +8,10 @@
 
 #include "application.h"
 
-dc_motor_t dc_motor_1 = {
-    .dc_motor_pins[DC_MOTOR_PIN_1].port = PORTC_INDEX,
-    .dc_motor_pins[DC_MOTOR_PIN_1].pin = GPIO_PIN0,
-    .dc_motor_pins[DC_MOTOR_PIN_1].direction = GPIO_DIRECTION_OUTPUT,
-    .dc_motor_pins[DC_MOTOR_PIN_1].logic = DC_MOTOR_OFF_STATUS,
-    
-    .dc_motor_pins[DC_MOTOR_PIN_2].port = PORTC_INDEX,
-    .dc_motor_pins[DC_MOTOR_PIN_2].pin = GPIO_PIN1,
-    .dc_motor_pins[DC_MOTOR_PIN_2].direction = GPIO_DIRECTION_OUTPUT,
-    .dc_motor_pins[DC_MOTOR_PIN_2].logic = DC_MOTOR_OFF_STATUS,
-};
-
-dc_motor_t dc_motor_2 = {
-    .dc_motor_pins[DC_MOTOR_PIN_1].port = PORTC_INDEX,
-    .dc_motor_pins[DC_MOTOR_PIN_1].pin = GPIO_PIN2,
-    .dc_motor_pins[DC_MOTOR_PIN_1].direction = GPIO_DIRECTION_OUTPUT,
-    .dc_motor_pins[DC_MOTOR_PIN_1].logic = DC_MOTOR_OFF_STATUS,
-    
-    .dc_motor_pins[DC_MOTOR_PIN_2].port = PORTC_INDEX,
-    .dc_motor_pins[DC_MOTOR_PIN_2].pin = GPIO_PIN3,
-    .dc_motor_pins[DC_MOTOR_PIN_2].direction = GPIO_DIRECTION_OUTPUT,
-    .dc_motor_pins[DC_MOTOR_PIN_2].logic = DC_MOTOR_OFF_STATUS,
-};
+uint8 Seven_Segment_Patterns[10] = {0xC0, 0xF9, 0xA4, 
+                                    0xB0, 0x99, 0x92, 
+                                    0x82, 0xF8, 0x80, 
+                                    0x90};
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
@@ -38,15 +19,13 @@ int main() {
     application_initialize();
 
     while (1) {
-        ret = dc_motor_move_right(&dc_motor_1);
-        ret = dc_motor_move_right(&dc_motor_2);
-        __delay_ms(3000);
-        ret = dc_motor_stop(&dc_motor_1);
-        ret = dc_motor_stop(&dc_motor_2);
-        __delay_ms(3000);
-        ret = dc_motor_move_left(&dc_motor_1);
-        ret = dc_motor_move_left(&dc_motor_2);
-        __delay_ms(3000);
+        for(uint8 i=0; i<99; i++){
+            uint8 temp = i;
+            gpio_port_write_logic(PORTD_INDEX, Seven_Segment_Patterns[temp % 10]);
+            temp /= 10;
+            gpio_port_write_logic(PORTC_INDEX, Seven_Segment_Patterns[temp]);
+            __delay_ms(500);
+        }  
     }
      
     return (EXIT_SUCCESS);
@@ -54,6 +33,6 @@ int main() {
 
 void application_initialize() {
     Std_ReturnType ret = E_NOT_OK;
-    ret = dc_motor_initialize(&dc_motor_1);
-    ret = dc_motor_initialize(&dc_motor_2);
+    ret = gpio_port_direction_initialize(PORTC_INDEX, GPIO_DIRECTION_OUTPUT);
+    ret = gpio_port_direction_initialize(PORTD_INDEX, GPIO_DIRECTION_OUTPUT);
 }
