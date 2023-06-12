@@ -12,6 +12,9 @@
 /* Section : Includes */
 #include "ECU_Layer/LED/ecu_led.h"
 #include "ECU_Layer/Button/ecu_button.h"
+#include "ECU_Layer/Relay/ecu_relay.h"
+#include "ECU_Layer/DC_Motor/ecu_dc_motor.h"
+
 
 /* Section : Macro Declarations */
 
@@ -21,9 +24,6 @@
 
 /* Section : Function Declarations */
 void application_initialize();
-void clock_signal(void);
-void latch_enable(void);
-void send_data(uint8 data_out);
 
 #endif	/* APPLICATION_H */
 
