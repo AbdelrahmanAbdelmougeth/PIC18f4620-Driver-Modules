@@ -10,18 +10,14 @@
 
 
 /* Section : Includes */
-#include "ECU_Layer/LED/ecu_led.h"
-#include "ECU_Layer/Button/ecu_button.h"
-#include "ECU_Layer/Relay/ecu_relay.h"
-#include "ECU_Layer/DC_Motor/ecu_dc_motor.h"
-#include "ECU_Layer/Seven_Segment_Display/ecu_seven_seg.h"
-
+#include "ECU_Layer/ecu_layer_init.h"
 
 /* Section : Macro Declarations */
 
 /* Section : Macro Functions Declarations */
 
 /* Section : Data-Type Declarations */
+extern keypad_t keypad_1;
 
 /* Section : Function Declarations */
 void application_initialize();
