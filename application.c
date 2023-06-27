@@ -12,12 +12,19 @@ int main() {
     Std_ReturnType ret = E_NOT_OK;
     application_initialize();
     
-    uint8 number = 244;
-    uint8 number_txt[4];
-    
-    ret = convert_byte_to_string(number, number_txt);
-    ret = lcd_4bit_send_string_pos(&_lcd_1, 1, 1, "Counter: ");
-    ret = lcd_4bit_send_string_pos(&_lcd_1, 1, 10, number_txt);
+    const uint8 customChar[] = {
+        0x0E,
+        0x08,
+        0x1E,
+        0x00,
+        0x08,
+        0x08,
+        0x08,
+        0x08
+    };
+  
+    ret = lcd_8bit_custom_char(&_lcd_2, 1, 1, customChar, 0);
+    ret = lcd_4bit_custom_char(&_lcd_1, 1, 1, customChar, 0);
     while (1) {
        
     } 

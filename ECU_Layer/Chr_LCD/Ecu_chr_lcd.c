@@ -106,7 +106,19 @@ Std_ReturnType lcd_4bit_send_string_pos(const chr_lcd_4bit_t* _lcd, uint8 row, u
     return ret;
 }
 
-Std_ReturnType lcd_4bit_custom_char(const chr_lcd_4bit_t* _lcd, uint8 row, uint8 column, const uint8 _chr[], uint8 mem_pos){}
+Std_ReturnType lcd_4bit_custom_char(const chr_lcd_4bit_t* _lcd, uint8 row, uint8 column, const uint8 _chr[], uint8 mem_pos){
+    Std_ReturnType ret = E_OK;
+    if(_lcd == NULL){
+        ret = E_NOT_OK;
+    }else{
+        ret = lcd_4bit_send_command(_lcd, (_LCD_CGRAM_START + (mem_pos*8)));
+        for(uint8 lcd_counter=0; lcd_counter<8; lcd_counter++){
+            ret = lcd_4bit_send_char_data(_lcd, _chr[lcd_counter]);
+        }
+        ret = lcd_4bit_send_char_data_pos(_lcd, row, column, mem_pos);
+    }
+    return ret;
+}
 
 
 Std_ReturnType lcd_8bit_initialize(const chr_lcd_8bit_t* _lcd){
@@ -200,7 +212,19 @@ Std_ReturnType lcd_8bit_send_string_pos(const chr_lcd_8bit_t* _lcd, uint8 row, u
     return ret;
 }
 
-Std_ReturnType lcd_8bit_custom_char(const chr_lcd_8bit_t* _lcd, uint8 row, uint8 column, const uint8 _chr[], uint8 mem_pos){}
+Std_ReturnType lcd_8bit_custom_char(const chr_lcd_8bit_t* _lcd, uint8 row, uint8 column, const uint8 _chr[], uint8 mem_pos){
+    Std_ReturnType ret = E_OK;
+    if(_lcd == NULL){
+        ret = E_NOT_OK;
+    }else{
+        ret = lcd_8bit_send_command(_lcd, (_LCD_CGRAM_START + (mem_pos*8)));
+        for(uint8 lcd_counter=0; lcd_counter<8; lcd_counter++){
+            ret = lcd_8bit_send_char_data(_lcd, _chr[lcd_counter]);
+        }
+        ret = lcd_8bit_send_char_data_pos(_lcd, row, column, mem_pos);
+    }
+    return ret;
+}
 
 
 Std_ReturnType convert_byte_to_string(uint8 value, uint8 *str){
@@ -219,7 +243,8 @@ Std_ReturnType convert_short_to_string(uint16 value, uint8 *str){
     if(str == NULL){
         ret = E_NOT_OK;
     }else{
-        
+        memset(str, '\0',6);
+        sprintf(str, "%i", value);
     }
     return ret;
 }
@@ -229,7 +254,8 @@ Std_ReturnType convert_int_to_string(uint32 value, uint8 *str){
     if(str == NULL){
         ret = E_NOT_OK;
     }else{
-        
+        memset(str, '\0',11);
+        sprintf(str, "%i", value);
     }
     return ret;
 }
