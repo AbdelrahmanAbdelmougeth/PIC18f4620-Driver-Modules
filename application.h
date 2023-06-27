@@ -17,7 +17,8 @@
 /* Section : Macro Functions Declarations */
 
 /* Section : Data-Type Declarations */
-extern keypad_t keypad_1;
+extern chr_lcd_4bit_t _lcd_1;
+extern chr_lcd_8bit_t _lcd_2;
 
 /* Section : Function Declarations */
 void application_initialize();
