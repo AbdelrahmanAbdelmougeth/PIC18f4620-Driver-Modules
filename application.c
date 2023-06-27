@@ -8,7 +8,6 @@
 
 #include "application.h"
 
-uint8 keypad_val = ZERO_INIT;
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
@@ -16,7 +15,6 @@ int main() {
     application_initialize();
     
     while (1) {
-        ret = keypad_get_value(&keypad_1, &keypad_val);
     }
      
     return (EXIT_SUCCESS);
