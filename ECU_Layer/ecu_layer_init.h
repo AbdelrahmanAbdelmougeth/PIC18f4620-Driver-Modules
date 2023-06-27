@@ -15,6 +15,7 @@
 #include "DC_Motor/ecu_dc_motor.h"
 #include "Seven_Segment_Display/ecu_seven_seg.h"
 #include "KeyPad/ecu_keypad.h"
+#include "Chr_LCD/ecu_chr_lcd.h"
 
 /* Section : Macro Declarations */
 
