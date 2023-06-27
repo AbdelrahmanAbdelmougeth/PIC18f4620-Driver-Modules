@@ -8,29 +8,19 @@
 
 #include "application.h"
 
-void loading_screen(void){
-    lcd_8bit_send_string_pos(&_lcd_2, 1,1, "Loading");
-    __delay_ms(150);
-    while(1){
-    lcd_8bit_send_string_pos(&_lcd_2, 1,8, ".  ");
-    __delay_ms(150);
-    lcd_8bit_send_string_pos(&_lcd_2, 1,8, ".. ");
-    __delay_ms(150);
-    lcd_8bit_send_string_pos(&_lcd_2, 1,8, "...");
-    __delay_ms(150);
-    }
-}
-
-
 int main() {
     Std_ReturnType ret = E_NOT_OK;
-
     application_initialize();
     
+    uint8 number = 244;
+    uint8 number_txt[4];
+    
+    ret = convert_byte_to_string(number, number_txt);
+    ret = lcd_4bit_send_string_pos(&_lcd_1, 1, 1, "Counter: ");
+    ret = lcd_4bit_send_string_pos(&_lcd_1, 1, 10, number_txt);
     while (1) {
-        loading_screen();
-    }
-     
+       
+    } 
     return (EXIT_SUCCESS);
 }
 

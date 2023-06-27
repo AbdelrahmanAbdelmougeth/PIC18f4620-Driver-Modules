@@ -11,6 +11,8 @@
 /* Section : Includes */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 
 /* Section : Macro Declarations */
 
