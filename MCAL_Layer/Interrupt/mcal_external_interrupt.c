@@ -11,6 +11,16 @@ static void(* INT0_InterruptHandler)(void) = NULL;
 static void(* INT1_InterruptHandler)(void) = NULL;
 static void(* INT2_InterruptHandler)(void) = NULL;
 
+static void(* RB4_InterruptHandler_HIGH)(void) = NULL;
+static void(* RB4_InterruptHandler_LOW)(void) = NULL;
+static void(* RB5_InterruptHandler_HIGH)(void) = NULL;
+static void(* RB5_InterruptHandler_LOW)(void) = NULL;
+static void(* RB6_InterruptHandler_HIGH)(void) = NULL;
+static void(* RB6_InterruptHandler_LOW)(void) = NULL;
+static void(* RB7_InterruptHandler_HIGH)(void) = NULL;
+static void(* RB7_InterruptHandler_LOW)(void) = NULL;
+
+
 static Std_ReturnType Interrupt_INTx_Enable(const interrupt_INTx_t* int_obj);
 static Std_ReturnType Interrupt_INTx_Disable(const interrupt_INTx_t* int_obj);
 static Std_ReturnType Interrupt_INTx_Priority_Init(const interrupt_INTx_t* int_obj);
@@ -89,6 +99,51 @@ void INT2_ISR(void){
     else{/*Nothing*/}
 }
 
+void RB4_ISR(uint8 interrupt_state){
+    /* The External RB4 Interrupt has been occurred (must be cleared in software) */ 
+    EXT_RBx_IterruptFlagClear();
+    /* Code : To be executed from MCAL Interrupt Context*/
+    
+    /* Callback function gets called every time this ISR executes*/
+    if(interrupt_state == GPIO_HIGH){ RB4_InterruptHandler_HIGH(); }
+    else if(interrupt_state == GPIO_LOW){ RB4_InterruptHandler_LOW(); }
+    else{/*Nothing*/}
+}
+
+void RB5_ISR(uint8 interrupt_state){
+    /* The External RB5 Interrupt has been occurred (must be cleared in software) */ 
+    EXT_RBx_IterruptFlagClear();
+    /* Code : To be executed from MCAL Interrupt Context*/
+    
+    /* Callback function gets called every time this ISR executes*/
+    if(interrupt_state == GPIO_HIGH){ RB5_InterruptHandler_HIGH(); }
+    else if(interrupt_state == GPIO_LOW){ RB5_InterruptHandler_LOW(); }
+    else{/*Nothing*/}
+}
+
+void RB6_ISR(uint8 interrupt_state){
+    /* The External RB6 Interrupt has been occurred (must be cleared in software) */ 
+    EXT_RBx_IterruptFlagClear();
+    /* Code : To be executed from MCAL Interrupt Context*/
+    
+    /* Callback function gets called every time this ISR executes*/
+    if(interrupt_state == GPIO_HIGH){ RB6_InterruptHandler_HIGH(); }
+    else if(interrupt_state == GPIO_LOW){ RB6_InterruptHandler_LOW(); }
+    else{/*Nothing*/}
+}
+
+void RB7_ISR(uint8 interrupt_state){
+    /* The External RB6 Interrupt has been occurred (must be cleared in software) */ 
+    EXT_RBx_IterruptFlagClear();
+    /* Code : To be executed from MCAL Interrupt Context*/
+    
+    /* Callback function gets called every time this ISR executes*/
+    if(interrupt_state == GPIO_HIGH){ RB7_InterruptHandler_HIGH(); }
+    else if(interrupt_state == GPIO_LOW){ RB7_InterruptHandler_LOW(); }
+    else{/*Nothing*/}
+}
+
+
 Std_ReturnType Interrupt_INTx_DeInit(const interrupt_INTx_t* int_obj){
     Std_ReturnType ret = E_OK;
     if(int_obj == NULL){
@@ -104,7 +159,52 @@ Std_ReturnType Interrupt_RBx_Init(const interrupt_RBx_t* int_obj){
     if(int_obj == NULL){
         ret = E_NOT_OK;
     }else{
-        
+        /*Disable The External ON-CHANGE Interrupt*/
+        EXT_RBx_InterruptDisable();
+        /*Clear Interrupt Flag : External ON-CHANGE Interrupt did not occur*/
+        EXT_RBx_IterruptFlagClear();
+        /*Configure External ON-CHANGE Interrupt priority*/ 
+        #if INTERRUPT_PRIORITY_LEVELS_ENABLE==INTERRUPT_FEATURE_ENABLE
+            INTERRUPT_PriorityLevelsEnable();
+            if(int_obj->priority == INTERRUPT_LOW_PRIORITY){
+                INTERRUPT_GobalInterruptLowEnable();
+                EXT_RBx_LowPrioritySet();
+            }
+            else if(int_obj->priority == INTERRUPT_HIGH_PRIORITY){
+                INTERRUPT_GobalInterruptHighEnable();
+                EXT_RBx_HighPrioritySet();
+            }
+            else{/*nothing*/} 
+        #else
+            INTERRUPT_GlobalInterruptEnable();
+            INTERRUPT_PeripheralInterruptEnable();
+        #endif
+        /*Configure Default Interrupt callback*/ 
+        switch(int_obj->mcu_pin.pin){
+            case GPIO_PIN4:
+                RB4_InterruptHandler_HIGH = int_obj->EXT_InterruptHandler_HIGH;
+                RB4_InterruptHandler_LOW = int_obj->EXT_InterruptHandler_LOW;
+                break;
+            case GPIO_PIN5:
+                RB5_InterruptHandler_HIGH = int_obj->EXT_InterruptHandler_HIGH;
+                RB5_InterruptHandler_LOW = int_obj->EXT_InterruptHandler_LOW;
+                break;
+            case GPIO_PIN6:
+                RB6_InterruptHandler_HIGH = int_obj->EXT_InterruptHandler_HIGH;
+                RB6_InterruptHandler_LOW = int_obj->EXT_InterruptHandler_LOW;
+                break;
+            case GPIO_PIN7:
+                RB7_InterruptHandler_HIGH = int_obj->EXT_InterruptHandler_HIGH;
+                RB7_InterruptHandler_LOW = int_obj->EXT_InterruptHandler_LOW;
+                break;
+            default:
+                ret = E_NOT_OK;
+                break;           
+        }            
+        /*Configure External RBx Interrupt I/O Pin*/ 
+        ret = gpio_pin_direction_initialize(&(int_obj->mcu_pin));        
+        /*Enable The External ON-CHANGE Interrupt*/
+        EXT_RBx_InterruptEnable();
     }
     return ret;
 }
@@ -114,7 +214,7 @@ Std_ReturnType Interrupt_RBx_DeInit(const interrupt_RBx_t* int_obj){
     if(int_obj == NULL){
         ret = E_NOT_OK;
     }else{
-        
+        EXT_RBx_InterruptDisable();
     }
     return ret;
 }
