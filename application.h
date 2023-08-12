@@ -11,14 +11,13 @@
 
 /* Section : Includes */
 #include "ECU_Layer/ecu_layer_init.h"
+#include "MCAL_Layer/Interrupt/mcal_external_interrupt.h"
 
 /* Section : Macro Declarations */
 
 /* Section : Macro Functions Declarations */
 
 /* Section : Data-Type Declarations */
-extern chr_lcd_4bit_t _lcd_1;
-extern chr_lcd_8bit_t _lcd_2;
 
 /* Section : Function Declarations */
 void application_initialize();

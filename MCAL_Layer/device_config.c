@@ -7,6 +7,7 @@
 
 #include "device_config.h"
 
+
 // PIC18F4620 Configuration Bit Settings
 
 // 'C' source line config statements
@@ -68,7 +69,3 @@
 
 // #pragma config statements should precede project file includes.
 // Use project enums instead of #define for ON and OFF.
-
-
-
-
