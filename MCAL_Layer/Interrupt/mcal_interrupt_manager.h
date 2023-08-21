@@ -28,5 +28,8 @@ void RB5_ISR(uint8 interrupt_state);
 void RB6_ISR(uint8 interrupt_state);
 void RB7_ISR(uint8 interrupt_state);
 
+void ADC_ISR(void);
+
+
 #endif	/* MCAL_INTERRUPT_MANAGER_H */
 

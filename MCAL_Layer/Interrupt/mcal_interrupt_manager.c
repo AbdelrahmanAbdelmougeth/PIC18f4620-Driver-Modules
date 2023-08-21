@@ -82,5 +82,11 @@ void __interrupt() InterruptManager(void){
         INT2_ISR();
     }
     else{/*nothing*/}
+    if((PIE1bits.ADIE == INTERRUPT_ENABLE) && (PIR1bits.ADIF == INTERRUPT_OCCUR)){
+        ADC_ISR();
+    }
+    else{/*nothing*/}
+    
+    
 }
 #endif
