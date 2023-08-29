@@ -9,43 +9,36 @@
 #include "application.h"
 
 led_t led1 = {.port_name = PORTC_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_LOW};
-led_t led2 = {.port_name = PORTC_INDEX, .pin = GPIO_PIN1, .led_status = GPIO_LOW};
 
-volatile uint8 timer0_250ms = 0, timer0_500ms = 0;
+volatile uint16 PushButtonCounter = 0;
 
 void Timer0_DefaultInterruptHandler(void){
-    timer0_250ms = 1;
-    timer0_500ms++;
+    
 }
 
-timer0_t timer0_timer_obj = {
+timer0_t timer0_counter_obj = {
     .TMR0_InterruptHandler = Timer0_DefaultInterruptHandler,
-    .timer0_mode = TIMER0_TIMER_MODE,
+    .timer0_mode = TIMER0_COUNTER_MODE,
+    .source_edge_select = TIMER0_INCREMENT_ON_FALLING_EDGE,
     .timer0_register_size = TIMER0_16BIT_REGISTER_ENABLED,
-    .prescaler_enable = TIMER0_PRESCALER_ENABLED,
-    .prescaler_value = TIMER0_PRESCALER_DIV_BY_4,
-    .timer0_preload_value = 3036
+    .prescaler_enable = TIMER0_PRESCALER_DISABLED,
+    .timer0_preload_value = 0
 };
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
     
-    ret = Timer0_Init(&timer0_timer_obj);
+    ret = Timer0_Init(&timer0_counter_obj);
     ret = led_initialize(&led1);
-    ret = led_initialize(&led2);
     
     while(1){
-        if(timer0_250ms == 1){
-            timer0_250ms = 0;
-            led_toggle(&led1);
+        ret = Timer0_Read_Value(&timer0_counter_obj, &PushButtonCounter);
+        if(PushButtonCounter == 5){
+            led_turn_on(&led1);
         }
-        else {/* Nothing */}
-        
-        if(timer0_500ms == 2){
-            led_toggle(&led2);
-            timer0_500ms = 0;
+        else{
+            led_turn_off(&led1);
         }
-        else {/* Nothing */}
     }
     return (EXIT_SUCCESS);
 }
