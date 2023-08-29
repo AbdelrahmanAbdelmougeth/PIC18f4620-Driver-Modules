@@ -30,6 +30,8 @@ void RB7_ISR(uint8 interrupt_state);
 
 void ADC_ISR(void);
 
+void TMR0_ISR(void);
+
 
 #endif	/* MCAL_INTERRUPT_MANAGER_H */
 

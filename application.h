@@ -14,6 +14,7 @@
 #include "MCAL_Layer/Interrupt/mcal_external_interrupt.h"
 #include "MCAL_Layer/EEPROM/hal_eeprom.h"
 #include "MCAL_Layer/hal_adc.h"
+#include "MCAL_Layer/Timer/hal_timer0.h"
 
 /* Section : Macro Declarations */
 
