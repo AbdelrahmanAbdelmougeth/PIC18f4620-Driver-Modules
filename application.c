@@ -11,11 +11,14 @@
 led_t led1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_LOW};
 
 volatile uint16 timer1_val = 0;
+volatile uint16 counter_val = 0;
 
 void Timer1_DefaultInterruptHandler(void){
     timer1_val++;
     led_toggle(&led1);
 }
+
+ timer1_t  counter_obj;
 
 void timer1_timer_init(void){
     timer1_t  timer_obj;
@@ -29,7 +32,18 @@ void timer1_timer_init(void){
 }
 
 void timer1_counter_init(void){
-    timer1_t  counter_obj;
+   
+   
+}
+
+
+int main() {
+    Std_ReturnType ret = E_NOT_OK;
+    
+    led_initialize(&led1);
+    //timer1_timer_init();
+    timer1_counter_init();
+    
     counter_obj.TMR1_InterruptHandler = Timer1_DefaultInterruptHandler;
     counter_obj.priority = INTERRUPT_LOW_PRIORITY;
     counter_obj.timer1_mode = TIMER1_COUNTER_MODE;
@@ -38,16 +52,9 @@ void timer1_counter_init(void){
     counter_obj.timer1_preload_value = 0;
     counter_obj.timer1_reg_rw_mode = TIMER1_REG_RW_16BIT_MODE_ENABLED;
     Timer1_Init(&counter_obj);
-}
-
-
-int main() {
-    Std_ReturnType ret = E_NOT_OK;
     
-    led_initialize(&led1);
-    timer1_timer_init();
-    
-    while(1){       
+    while(1){
+        Timer1_Read_Value(&counter_obj, &counter_val);
     }
     
     return (EXIT_SUCCESS);
