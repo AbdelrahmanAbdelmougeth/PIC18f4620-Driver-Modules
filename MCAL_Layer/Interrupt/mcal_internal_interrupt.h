@@ -46,6 +46,22 @@
 
 #endif
 
+#if TIMER1_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
+    /*This Macro Will Enable The Internal TIMER0 Interrupt*/
+    #define TIMER1_IterruptEnable()      (PIE1bits.TMR1IE = 1)
+    /*This Macro Will Disable The Internal TIMER0 Interrupt*/
+    #define TIMER1_IterruptDisable()     (PIE1bits.TMR1IE = 0)
+    /*This Macro Will Clear The Internal TIMER0 Flag Bit*/
+    #define TIMER1_IterruptFlagClear()   (PIR1bits.TMR1IF = 0)
+    #if INTERRUPT_PRIORITY_LEVELS_ENABLE==INTERRUPT_FEATURE_ENABLE
+        /*This Macro will set the Internal TIMER0 Interrupt priority to be high*/
+        #define TIMER1_INTERRUPT_HighPrioritySet() (IPR1bits.TMR1IP = 1)
+        /*This Macro will set the Internal TIMER0 Interrupt priority to be low*/
+        #define TIMER1_INTERRUPT_LowPrioritySet()  (IPR1bits.TMR1IP = 0)
+    #endif
+
+#endif
+
 /* Section : Macro Functions Declarations */
 
 /* Section : Data-Type Declarations */
