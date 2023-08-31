@@ -100,5 +100,11 @@ void __interrupt() InterruptManager(void){
         TMR1_ISR();
     }
     else{/*nothing*/}
+    
+    /* Timer2 Interrupt*/
+    if((PIE1bits.TMR2IE == INTERRUPT_ENABLE) && (PIR1bits.TMR2IF == INTERRUPT_OCCUR)){
+        TMR2_ISR();
+    }
+    else{/*nothing*/}
 }
 #endif
