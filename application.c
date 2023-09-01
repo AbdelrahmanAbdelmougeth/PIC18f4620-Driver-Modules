@@ -8,33 +8,35 @@
 
 #include "application.h"
 
+volatile uint32 timer3_on;
+
 led_t led1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_LOW};
 
-volatile uint16 timer2_val = 0;
-
-void Timer2_DefaultInterruptHandler(void){
-    timer2_val++;
+void Timer3_DefaultInterruptHandler(void){
+    timer3_on++;
     led_toggle(&led1);
 }
 
- timer1_t  counter_obj;
-
-void timer2_timer_init(void){
-    timer2_t timer_obj;
-    timer_obj.TMR2_InterruptHandler = Timer2_DefaultInterruptHandler;
+void timer3_timer_init(void){
+    timer3_t timer_obj;
+    timer_obj.TMR3_InterruptHandler = Timer3_DefaultInterruptHandler;
     timer_obj.priority = INTERRUPT_LOW_PRIORITY;
-    timer_obj.timer2_postscaler_value = TIMER2_POSTSCALER_DIV_BY_16;
-    timer_obj.timer2_prescaler_value = TIMER2_PRESCALER_DIV_BY_1;
-    timer_obj.timer2_preload_value = 249;
-    Timer2_Init(&timer_obj);
+    timer_obj.timer3_mode = TIMER3_TIMER_MODE;
+    timer_obj.timer3_prescaler_value = TIMER3_PRESCALER_DIV_BY_8;
+    timer_obj.timer3_preload_value = 15536;
+    timer_obj.timer3_reg_rw_mode = TIMER3_REG_RW_16BIT_MODE_ENABLED;
+    Timer3_Init(&timer_obj);
 }
+
+
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
+    application_initialize();
     
-    led_initialize(&led1);
-    timer2_timer_init();
-      
+    timer3_timer_init();
+    ret = led_initialize(&led1);
+    
     while(1){
     }
     
