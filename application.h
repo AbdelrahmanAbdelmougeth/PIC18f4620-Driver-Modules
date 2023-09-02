@@ -18,6 +18,7 @@
 #include "MCAL_Layer/Timer1/hal_timer1.h"
 #include "MCAL_Layer/Timer2/hal_timer2.h"
 #include "MCAL_Layer/Timer3/hal_timer3.h"
+#include "MCAL_Layer/CCP1/hal_ccp1.h"
 
 /* Section : Macro Declarations */
 
