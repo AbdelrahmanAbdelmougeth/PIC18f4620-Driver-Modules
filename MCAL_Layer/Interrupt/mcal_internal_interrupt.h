@@ -95,7 +95,7 @@
 #endif
 
 
-#if CCP1_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
+#if CCPx_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
     /*This Macro Will Enable The Internal CCP1 Interrupt*/
     #define CCP1_IterruptEnable()      (PIE1bits.CCP1IE = 1)
     /*This Macro Will Disable The Internal CCP1 Interrupt*/
@@ -107,6 +107,19 @@
         #define CCP1_INTERRUPT_HighPrioritySet() (IPR1bits.CCP1IP = 1)
         /*This Macro will set the Internal CCP1 Interrupt priority to be low*/
         #define CCP1_INTERRUPT_LowPrioritySet()  (IPR1bits.CCP1IP = 0)
+    #endif
+
+    /*This Macro Will Enable The Internal CCP2 Interrupt*/
+    #define CCP2_IterruptEnable()      (PIE2bits.CCP2IE = 1)
+    /*This Macro Will Disable The Internal CCP2 Interrupt*/
+    #define CCP2_IterruptDisable()     (PIE2bits.CCP2IE = 0)
+    /*This Macro Will Clear The Internal CCP2 Flag Bit*/
+    #define CCP2_IterruptFlagClear()   (PIR2bits.CCP2IF = 0)
+    #if INTERRUPT_PRIORITY_LEVELS_ENABLE==INTERRUPT_FEATURE_ENABLE
+        /*This Macro will set the Internal CCP2 Interrupt priority to be high*/
+        #define CCP2_INTERRUPT_HighPrioritySet() (IPR2bits.CCP2IP = 1)
+        /*This Macro will set the Internal CCP1 Interrupt priority to be low*/
+        #define CCP2_INTERRUPT_LowPrioritySet()  (IPR2bits.CCP2IP = 0)
     #endif
 
 #endif

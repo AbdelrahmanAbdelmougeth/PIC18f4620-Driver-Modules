@@ -112,5 +112,17 @@ void __interrupt() InterruptManager(void){
         TMR3_ISR();
     }
     else{/*nothing*/}
+    
+    /* CCP1  Interrupt*/
+    if((PIE1bits.CCP1IE == INTERRUPT_ENABLE) && (PIR1bits.CCP1IF == INTERRUPT_OCCUR)){
+        CCP1_ISR();
+    }
+    else{/*nothing*/}
+    
+    /* CCP2  Interrupt*/
+    if((PIE2bits.CCP2IE == INTERRUPT_ENABLE) && (PIR2bits.CCP2IF == INTERRUPT_OCCUR)){
+        CCP2_ISR();
+    }
+    else{/*nothing*/}
 }
 #endif
