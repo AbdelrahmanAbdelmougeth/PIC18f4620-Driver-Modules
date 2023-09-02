@@ -23,8 +23,8 @@ int main() {
     ccp1_obj.ccp_pin.port = PORTC_INDEX;
     ccp1_obj.ccp_pin.pin = GPIO_PIN2;
     ccp1_obj.ccp_pin.direction = GPIO_DIRECTION_OUTPUT;
-    ccp1_obj.timer2_postscaler_value = 1;
-    ccp1_obj.timer2_prescaler_value = 1;    
+    ccp1_obj.timer2_postscaler_value = CCP1_TIMER2_POSTSCALER_DIV_BY_1;
+    ccp1_obj.timer2_prescaler_value = CCP1_TIMER2_PRESCALER_DIV_BY_1;    
     ret = CCP1_Init(&ccp1_obj);
     
     timer_obj.TMR2_InterruptHandler = NULL;
