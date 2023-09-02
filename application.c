@@ -8,24 +8,39 @@
 
 #include "application.h"
 
-volatile uint16 timer_counter_val;
-timer3_t counter_obj;
+timer2_t timer_obj;
+ccp1_t ccp1_obj;
+uint8 PWM_DUTY_CYCLE = 0;
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
     application_initialize();
     
-    counter_obj.TMR3_InterruptHandler = NULL;
-    counter_obj.priority = INTERRUPT_LOW_PRIORITY;
-    counter_obj.timer3_mode = TIMER3_COUNTER_MODE;
-    counter_obj.timer3_prescaler_value = TIMER3_PRESCALER_DIV_BY_1;
-    counter_obj.timer3_preload_value = 0;
-    counter_obj.timer3_reg_rw_mode = TIMER3_REG_RW_16BIT_MODE_ENABLED;
-    counter_obj.timer3_counter_mode = TIMER3_SYNC_COUNTER_MODE;
-    ret = Timer3_Init(&counter_obj);
+    ccp1_obj.CCP1_InterruptHandler = NULL;
+    ccp1_obj.ccp1_mode = CCP1_PWM_MODE_SELECTED;
+    ccp1_obj.ccp1_mode_varient = CCP1_PWM_MODE;
+    ccp1_obj.PWM_frequency = 20000;
+    ccp1_obj.ccp_pin.port = PORTC_INDEX;
+    ccp1_obj.ccp_pin.pin = GPIO_PIN2;
+    ccp1_obj.ccp_pin.direction = GPIO_DIRECTION_OUTPUT;
+    ccp1_obj.timer2_postscaler_value = 1;
+    ccp1_obj.timer2_prescaler_value = 1;    
+    ret = CCP1_Init(&ccp1_obj);
+    
+    timer_obj.TMR2_InterruptHandler = NULL;
+    timer_obj.timer2_postscaler_value = TIMER2_POSTSCALER_DIV_BY_1;
+    timer_obj.timer2_prescaler_value = TIMER2_PRESCALER_DIV_BY_1;
+    timer_obj.timer2_preload_value = 0;
+    ret = Timer2_Init(&timer_obj);
+    
+    CCP1_PWM1_Set_Duty(PWM_DUTY_CYCLE);
+    CCP1_PWM1_Start();
     
     while(1){
-        ret = Timer3_Read_Value(&counter_obj, &timer_counter_val);
+        for (PWM_DUTY_CYCLE = 0; PWM_DUTY_CYCLE < 100; PWM_DUTY_CYCLE += 5){
+            __delay_ms(5);
+            CCP1_PWM1_Set_Duty(PWM_DUTY_CYCLE);
+        } 
     }
     return (EXIT_SUCCESS);
 }
