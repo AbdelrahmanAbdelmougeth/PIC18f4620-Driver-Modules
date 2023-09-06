@@ -106,7 +106,7 @@ typedef struct{
         void (* CCPx_InterruptHandler)(void);
         interrupt_periority_cfg priority;
     #endif
-    #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_CAPTURE_MODE_SELECTED
+    #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_CAPTURE_MODE_SELECTED || CCPx_CFG_SELECTED_MODE == CCPx_CFG_COMPARE_MODE_SELECTED
         ccp_capture_timer_t ccp_capture_timer;
     #endif    
     #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_PWM_MODE_SELECTED
@@ -126,8 +126,8 @@ Std_ReturnType CCPx_DeInit(const ccpx_t* _ccp_obj);
 #endif
 
 #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_COMPARE_MODE_SELECTED
-    Std_ReturnType CCP1_IsCompareTriggered(uint8 *_compare_status);
-    Std_ReturnType CCP1_Compare_Mode_Write_Value(uint16 _compare_value);
+    Std_ReturnType CCPx_IsCompareTriggered(const ccpx_t* _ccp_obj, uint8 *_compare_status);
+    Std_ReturnType CCPx_Compare_Mode_Write_Value(const ccpx_t* _ccp_obj, uint16 _compare_value);
 #endif
 
 #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_PWM_MODE_SELECTED

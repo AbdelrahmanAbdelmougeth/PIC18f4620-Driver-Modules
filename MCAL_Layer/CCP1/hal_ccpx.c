@@ -15,8 +15,10 @@
 #endif 
 
 static inline Std_ReturnType CCP1_Init(const ccpx_t* _ccp_obj);    
-static inline Std_ReturnType CCP2_Init(const ccpx_t* _ccp_obj);    
-static inline void CCPx_capture_mode_timer_select(const ccpx_t* _ccp_obj);     
+static inline Std_ReturnType CCP2_Init(const ccpx_t* _ccp_obj);
+#if CCPx_CFG_SELECTED_MODE == CCPx_CFG_CAPTURE_MODE_SELECTED || CCPx_CFG_SELECTED_MODE == CCPx_CFG_COMPARE_MODE_SELECTED
+    static inline void CCPx_capture_compare_mode_timer_select(const ccpx_t* _ccp_obj);
+#endif
     
 Std_ReturnType CCPx_Init(const ccpx_t* _ccp_obj){
     Std_ReturnType ret = E_OK;
@@ -49,8 +51,7 @@ static inline Std_ReturnType CCP1_Init(const ccpx_t* _ccp_obj){
                 case CCPx_CAPTURE_MODE_4_RISING_EDGE : CCP1_SET_MODE(CCPx_CAPTURE_MODE_4_RISING_EDGE);  break;
                 case CCPx_CAPTURE_MODE_16_RISING_EDGE: CCP1_SET_MODE(CCPx_CAPTURE_MODE_16_RISING_EDGE); break;
                 default: ret = E_NOT_OK;
-            }
-            CCPx_capture_mode_timer_select(_ccp_obj);
+            }    
         }else if(_ccp_obj->ccpx_mode == CCPx_COMPARE_MODE_SELECTED){
             switch(_ccp_obj->ccpx_mode_varient){
                 case CCPx_COMPARE_MODE_TOGGLE_ON_MATCH  : CCP1_SET_MODE(CCPx_COMPARE_MODE_TOGGLE_ON_MATCH);   break;
@@ -69,7 +70,11 @@ static inline Std_ReturnType CCP1_Init(const ccpx_t* _ccp_obj){
                 PR2 = (uint8)((_XTAL_FREQ / (_ccp_obj->PWM_frequency * 4.0 * _ccp_obj->timer2_postscaler_value * 
                         _ccp_obj->timer2_prescaler_value)) - 1);
             #endif
-        }else{/* nothing */} 
+        }else{/* nothing */}
+        
+        #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_CAPTURE_MODE_SELECTED || CCPx_CFG_SELECTED_MODE == CCPx_CFG_COMPARE_MODE_SELECTED
+            CCPx_capture_compare_mode_timer_select(_ccp_obj);
+        #endif
 
         /* pin configuration */
         gpio_pin_initialize(&(_ccp_obj->ccpx_pin));
@@ -111,8 +116,7 @@ static inline Std_ReturnType CCP2_Init(const ccpx_t* _ccp_obj){
                 case CCPx_CAPTURE_MODE_4_RISING_EDGE : CCP2_SET_MODE(CCPx_CAPTURE_MODE_4_RISING_EDGE);  break;
                 case CCPx_CAPTURE_MODE_16_RISING_EDGE: CCP2_SET_MODE(CCPx_CAPTURE_MODE_16_RISING_EDGE); break;
                 default: ret = E_NOT_OK;
-            }
-            CCPx_capture_mode_timer_select(_ccp_obj);            
+            }            
         }else if(_ccp_obj->ccpx_mode == CCPx_COMPARE_MODE_SELECTED){
             switch(_ccp_obj->ccpx_mode_varient){
                 case CCPx_COMPARE_MODE_TOGGLE_ON_MATCH  : CCP2_SET_MODE(CCPx_COMPARE_MODE_TOGGLE_ON_MATCH);   break;
@@ -133,6 +137,10 @@ static inline Std_ReturnType CCP2_Init(const ccpx_t* _ccp_obj){
             #endif
         }else{/* nothing */} 
 
+        #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_CAPTURE_MODE_SELECTED || CCPx_CFG_SELECTED_MODE == CCPx_CFG_COMPARE_MODE_SELECTED
+            CCPx_capture_compare_mode_timer_select(_ccp_obj);
+        #endif
+        
         /* pin configuration */
         gpio_pin_initialize(&(_ccp_obj->ccpx_pin));
 
@@ -227,43 +235,64 @@ Std_ReturnType CCPx_DeInit(const ccpx_t* _ccp_obj){
     }
     
 #endif
-
-static inline void CCPx_capture_mode_timer_select(const ccpx_t* _ccp_obj){
-    if(_ccp_obj->ccp_capture_timer == CCP1_CCP2_TIMER1){
-        T3CONbits.T3CCP1 = 0;
-        T3CONbits.T3CCP2 = 0;
-    }else if(_ccp_obj->ccp_capture_timer == CCP1_TIMER1_CCP2_TIMER2){
-        T3CONbits.T3CCP1 = 1;
-        T3CONbits.T3CCP2 = 0;
-    }else if(_ccp_obj->ccp_capture_timer == CCP1_CCP2_TIMER3){
-        T3CONbits.T3CCP2 = 1;
-    }else{ /* nothing */ }      
-}     
+    
+#if CCPx_CFG_SELECTED_MODE == CCPx_CFG_CAPTURE_MODE_SELECTED || CCPx_CFG_SELECTED_MODE == CCPx_CFG_COMPARE_MODE_SELECTED
+    static inline void CCPx_capture_compare_mode_timer_select(const ccpx_t* _ccp_obj){
+        if(_ccp_obj->ccp_capture_timer == CCP1_CCP2_TIMER1){
+            T3CONbits.T3CCP1 = 0;
+            T3CONbits.T3CCP2 = 0;
+        }else if(_ccp_obj->ccp_capture_timer == CCP1_TIMER1_CCP2_TIMER2){
+            T3CONbits.T3CCP1 = 1;
+            T3CONbits.T3CCP2 = 0;
+        }else if(_ccp_obj->ccp_capture_timer == CCP1_CCP2_TIMER3){
+            T3CONbits.T3CCP2 = 1;
+        }else{ /* nothing */ }      
+    }  
+#endif
+   
 
     
 #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_COMPARE_MODE_SELECTED
     
-    Std_ReturnType CCP1_IsCompareTriggered(uint8 *_compare_status){
+    Std_ReturnType CCP1_IsCompareTriggered(const ccpx_t* _ccp_obj, uint8 *_compare_status){
         Std_ReturnType ret = E_OK;
         if(_compare_status == NULL){
             ret = E_NOT_OK;
         }else{
-            if(PIR1bits.CCP1IF == CCP1_COMPARE_TRIGGERED){
-                *_compare_status = CCP1_COMPARE_TRIGGERED;
-                CCP1_IterruptFlagClear();
-            }else{
-                *_compare_status = CCP1_COMPARE_IDLE;
-            }
+            if(_ccp_obj->ccpx_inst == CCP1_INST){
+                if(PIR1bits.CCP1IF == CCPx_COMPARE_TRIGGERED){
+                    *_compare_status = CCPx_COMPARE_TRIGGERED;
+                    CCP1_IterruptFlagClear();
+                }else{
+                    *_compare_status = CCPx_COMPARE_IDLE;
+                }
+            }else if(_ccp_obj->ccpx_inst == CCP2_INST){
+                if(PIR2bits.CCP2IF == CCPx_COMPARE_TRIGGERED){
+                    *_compare_status = CCPx_COMPARE_TRIGGERED;
+                    CCP2_IterruptFlagClear();
+                }else{
+                    *_compare_status = CCPx_COMPARE_IDLE;
+                }
+            }     
         }
         return ret;
     }
     
-    Std_ReturnType CCP1_Compare_Mode_Write_Value(uint16 _compare_value){
-        Std_ReturnType ret = E_OK;
-        CCP1_PERIOD_REG_T ccpr1 = {.ccpr1_low = ZERO_INIT, .ccpr1_high = ZERO_INIT};
-        ccpr1.ccpr1_16_bit = _compare_value;
-        CCPR1L = ccpr1.ccpr1_low;
-        CCPR1H = ccpr1.ccpr1_high;
+    Std_ReturnType CCPx_Compare_Mode_Write_Value(const ccpx_t* _ccp_obj, uint16 _compare_value){
+        Std_ReturnType ret = E_OK; 
+        if(_ccp_obj == NULL){
+           ret = E_NOT_OK;
+        }else{
+            CCPx_PERIOD_REG_T ccprx = {.ccprx_low = ZERO_INIT, .ccprx_high = ZERO_INIT};
+            ccprx.ccprx_16_bit = _compare_value;
+            if(_ccp_obj->ccpx_inst == CCP1_INST){
+                CCPR1L = ccprx.ccprx_low;
+                CCPR1H = ccprx.ccprx_high;
+            }else if(_ccp_obj->ccpx_inst == CCP2_INST){
+                CCPR2L = ccprx.ccprx_low;
+                CCPR2H = ccprx.ccprx_high;  
+            }else{/* nothing */} 
+        }   
         return ret;
     }
     
