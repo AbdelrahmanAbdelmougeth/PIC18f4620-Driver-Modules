@@ -8,60 +8,55 @@
 
 #include "application.h"
 
-timer2_t timer_obj;
-ccpx_t ccp1_obj;
-ccpx_t ccp2_obj;
-uint8 PWM_DUTY_CYCLE = 0;
+volatile uint32 CCP1_Interrupt_flag;
+volatile uint32 CCP2_Interrupt_flag;
+
+timer3_t timer_obj;
+ccpx_t capture1_obj;
+ccpx_t capture2_obj;
+
+void Timer3_DefaultInterruptHandler(void){
+}
+void CCP1_DefaultInterruptHandler(void){
+    CCP1_Interrupt_flag++;
+}
+void CCP2_DefaultInterruptHandler(void){
+    CCP2_Interrupt_flag++;
+}
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
     application_initialize();
     
-    ccp1_obj.ccpx_inst = CCP1_INST;
-    ccp1_obj.CCPx_InterruptHandler = NULL;
-    ccp1_obj.ccpx_mode = CCPx_PWM_MODE_SELECTED;
-    ccp1_obj.ccpx_mode_varient = CCPx_PWM_MODE;
-    ccp1_obj.PWM_frequency = 20000;
-    ccp1_obj.ccpx_pin.port = PORTC_INDEX;
-    ccp1_obj.ccpx_pin.pin = GPIO_PIN2;
-    ccp1_obj.ccpx_pin.direction = GPIO_DIRECTION_OUTPUT;
-    ccp1_obj.timer2_postscaler_value = CCPx_TIMER2_POSTSCALER_DIV_BY_1;
-    ccp1_obj.timer2_prescaler_value = CCPx_TIMER2_PRESCALER_DIV_BY_1;    
-    ret = CCPx_Init(&ccp1_obj);
+    capture1_obj.CCPx_InterruptHandler = CCP1_DefaultInterruptHandler;
+    capture1_obj.ccpx_inst = CCP1_INST;
+    capture1_obj.ccp_capture_timer = CCP1_CCP2_TIMER3;
+    capture1_obj.ccpx_mode = CCPx_CAPTURE_MODE_SELECTED;
+    capture1_obj.ccpx_mode_varient = CCPx_CAPTURE_MODE_4_RISING_EDGE;
+    capture1_obj.ccpx_pin.port = PORTC_INDEX;
+    capture1_obj.ccpx_pin.pin = GPIO_PIN2;
+    capture1_obj.ccpx_pin.direction = GPIO_DIRECTION_INPUT;
+    ret = CCPx_Init(&capture1_obj);
     
-    ccp2_obj.ccpx_inst = CCP2_INST;
-    ccp2_obj.CCPx_InterruptHandler = NULL;
-    ccp2_obj.ccpx_mode = CCPx_PWM_MODE_SELECTED;
-    ccp2_obj.ccpx_mode_varient = CCPx_PWM_MODE;
-    ccp2_obj.PWM_frequency = 20000;
-    ccp2_obj.ccpx_pin.port = PORTC_INDEX;
-    ccp2_obj.ccpx_pin.pin = GPIO_PIN1;
-    ccp2_obj.ccpx_pin.direction = GPIO_DIRECTION_OUTPUT;
-    ccp2_obj.timer2_postscaler_value = CCPx_TIMER2_POSTSCALER_DIV_BY_1;
-    ccp2_obj.timer2_prescaler_value = CCPx_TIMER2_PRESCALER_DIV_BY_1;    
-    ret = CCPx_Init(&ccp2_obj);
+    capture2_obj.CCPx_InterruptHandler = CCP2_DefaultInterruptHandler;
+    capture2_obj.ccpx_inst = CCP2_INST;
+    capture2_obj.ccp_capture_timer = CCP1_CCP2_TIMER3;
+    capture2_obj.ccpx_mode = CCPx_CAPTURE_MODE_SELECTED;
+    capture2_obj.ccpx_mode_varient = CCPx_CAPTURE_MODE_16_RISING_EDGE;
+    capture2_obj.ccpx_pin.port = PORTC_INDEX;
+    capture2_obj.ccpx_pin.pin = GPIO_PIN1;
+    capture2_obj.ccpx_pin.direction = GPIO_DIRECTION_INPUT;
+    ret = CCPx_Init(&capture2_obj);
     
-    timer_obj.TMR2_InterruptHandler = NULL;
-    timer_obj.timer2_postscaler_value = TIMER2_POSTSCALER_DIV_BY_1;
-    timer_obj.timer2_prescaler_value = TIMER2_PRESCALER_DIV_BY_1;
-    timer_obj.timer2_preload_value = 0;
-    ret = Timer2_Init(&timer_obj);
+    timer_obj.TMR3_InterruptHandler = Timer3_DefaultInterruptHandler;
+    timer_obj.timer3_mode = TIMER3_TIMER_MODE;
+    timer_obj.priority = INTERRUPT_LOW_PRIORITY;
+    timer_obj.timer3_prescaler_value = TIMER3_PRESCALER_DIV_BY_1;
+    timer_obj.timer3_preload_value = 0;
+    timer_obj.timer3_reg_rw_mode = TIMER3_REG_RW_8BIT_MODE_ENABLED;
+    Timer3_Init(&timer_obj);
     
-    CCPx_PWM_Set_Duty(&ccp1_obj, 50);
-    CCPx_PWM_Start(&ccp1_obj);
-    
-    CCPx_PWM_Set_Duty(&ccp2_obj, 70);
-    CCPx_PWM_Start(&ccp2_obj);
-     
     while(1){
-//        for (PWM_DUTY_CYCLE = 0; PWM_DUTY_CYCLE < 100; PWM_DUTY_CYCLE += 5){
-//            __delay_ms(5);
-//            CCPx_PWM_Set_Duty(&ccp1_obj, PWM_DUTY_CYCLE);
-//        } 
-//        for (PWM_DUTY_CYCLE = 0; PWM_DUTY_CYCLE < 100; PWM_DUTY_CYCLE += 5){
-//            __delay_ms(5);
-//            CCPx_PWM_Set_Duty(&ccp2_obj, PWM_DUTY_CYCLE);
-//        } 
     }
     return (EXIT_SUCCESS);
 }
