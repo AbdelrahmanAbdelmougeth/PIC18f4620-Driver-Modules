@@ -16,7 +16,7 @@
 
 static inline Std_ReturnType CCP1_Init(const ccpx_t* _ccp_obj);    
 static inline Std_ReturnType CCP2_Init(const ccpx_t* _ccp_obj);    
-    
+static inline void CCPx_capture_mode_timer_select(const ccpx_t* _ccp_obj);     
     
 Std_ReturnType CCPx_Init(const ccpx_t* _ccp_obj){
     Std_ReturnType ret = E_OK;
@@ -49,7 +49,8 @@ static inline Std_ReturnType CCP1_Init(const ccpx_t* _ccp_obj){
                 case CCPx_CAPTURE_MODE_4_RISING_EDGE : CCP1_SET_MODE(CCPx_CAPTURE_MODE_4_RISING_EDGE);  break;
                 case CCPx_CAPTURE_MODE_16_RISING_EDGE: CCP1_SET_MODE(CCPx_CAPTURE_MODE_16_RISING_EDGE); break;
                 default: ret = E_NOT_OK;
-            }  
+            }
+            CCPx_capture_mode_timer_select(_ccp_obj);
         }else if(_ccp_obj->ccpx_mode == CCPx_COMPARE_MODE_SELECTED){
             switch(_ccp_obj->ccpx_mode_varient){
                 case CCPx_COMPARE_MODE_TOGGLE_ON_MATCH  : CCP1_SET_MODE(CCPx_COMPARE_MODE_TOGGLE_ON_MATCH);   break;
@@ -110,7 +111,8 @@ static inline Std_ReturnType CCP2_Init(const ccpx_t* _ccp_obj){
                 case CCPx_CAPTURE_MODE_4_RISING_EDGE : CCP2_SET_MODE(CCPx_CAPTURE_MODE_4_RISING_EDGE);  break;
                 case CCPx_CAPTURE_MODE_16_RISING_EDGE: CCP2_SET_MODE(CCPx_CAPTURE_MODE_16_RISING_EDGE); break;
                 default: ret = E_NOT_OK;
-            }  
+            }
+            CCPx_capture_mode_timer_select(_ccp_obj);            
         }else if(_ccp_obj->ccpx_mode == CCPx_COMPARE_MODE_SELECTED){
             switch(_ccp_obj->ccpx_mode_varient){
                 case CCPx_COMPARE_MODE_TOGGLE_ON_MATCH  : CCP2_SET_MODE(CCPx_COMPARE_MODE_TOGGLE_ON_MATCH);   break;
@@ -182,35 +184,61 @@ Std_ReturnType CCPx_DeInit(const ccpx_t* _ccp_obj){
 
 #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_CAPTURE_MODE_SELECTED
 
-    Std_ReturnType CCPx_IsCapturedDataReady(uint8 *_capture_status){
+    Std_ReturnType CCPx_IsCapturedDataReady(const ccpx_t* _ccp_obj, uint8 *_capture_status){
         Std_ReturnType ret = E_OK;
         if(_capture_status == NULL){
             ret = E_NOT_OK;
         }else{
-            if(PIR1bits.CCP1IF == CCP1_CAPTURE_TRIGGERED){
-                *_capture_status = CCP1_CAPTURE_TRIGGERED;
-                CCP1_IterruptFlagClear();
-            }else{
-                *_capture_status = CCP1_CAPTURE_IDLE;
-            }
+            if(_ccp_obj->ccpx_inst == CCP1_INST){
+                if(PIR1bits.CCP1IF == CCPx_CAPTURE_TRIGGERED){
+                    *_capture_status = CCPx_CAPTURE_TRIGGERED;
+                    CCP1_IterruptFlagClear();
+                }else{
+                    *_capture_status = CCPx_CAPTURE_IDLE;
+                }
+            }else if(_ccp_obj->ccpx_inst == CCP1_INST){
+                if(PIR2bits.CCP2IF == CCPx_CAPTURE_TRIGGERED){
+                    *_capture_status = CCPx_CAPTURE_TRIGGERED;
+                    CCP2_IterruptFlagClear();
+                }else{
+                    *_capture_status = CCPx_CAPTURE_IDLE;
+                }
+            }else{ /* nothing */ }   
         }
         return ret;
     }
     
-    Std_ReturnType CCP1_Capture_Mode_Read_Value(uint16 *_captured_value){
+    Std_ReturnType CCP1_Capture_Mode_Read_Value(const ccpx_t* _ccp_obj, uint16 *_captured_value){
         Std_ReturnType ret = E_OK;
-        CCP1_PERIOD_REG_T ccpr1 = {.ccpr1_low = ZERO_INIT, .ccpr1_high = ZERO_INIT};
+        CCPx_PERIOD_REG_T ccpr1 = {.ccprx_low = ZERO_INIT, .ccprx_high = ZERO_INIT};
         if(_captured_value == NULL){
             ret = E_NOT_OK;
         }else{
-            ccpr1.ccpr1_low = CCPR1L;
-            ccpr1.ccpr1_high = CCPR1H;
-            *_captured_value = ccpr1.ccpr1_16_bit;
+            if(_ccp_obj->ccpx_inst == CCP1_INST){
+                
+            }else if(_ccp_obj->ccpx_inst == CCP1_INST){
+            }else{ /* nothing */ }
+            
+            ccpr1.ccprx_low = CCPR1L;
+            ccpr1.ccprx_high = CCPR1H;
+            *_captured_value = ccpr1.ccprx_16_bit;
         }
         return ret;             
     }
     
 #endif
+
+static inline void CCPx_capture_mode_timer_select(const ccpx_t* _ccp_obj){
+    if(_ccp_obj->ccp_capture_timer == CCP1_CCP2_TIMER1){
+        T3CONbits.T3CCP1 = 0;
+        T3CONbits.T3CCP2 = 0;
+    }else if(_ccp_obj->ccp_capture_timer == CCP1_TIMER1_CCP2_TIMER2){
+        T3CONbits.T3CCP1 = 1;
+        T3CONbits.T3CCP2 = 0;
+    }else if(_ccp_obj->ccp_capture_timer == CCP1_CCP2_TIMER3){
+        T3CONbits.T3CCP2 = 1;
+    }else{ /* nothing */ }      
+}     
 
     
 #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_COMPARE_MODE_SELECTED

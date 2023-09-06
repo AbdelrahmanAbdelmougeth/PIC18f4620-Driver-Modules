@@ -76,6 +76,12 @@ typedef enum{
     CCP2_INST        
 }ccpx_inst_t;
 
+typedef enum{
+    CCP1_CCP2_TIMER1 = 0,
+    CCP1_TIMER1_CCP2_TIMER2,
+    CCP1_CCP2_TIMER3        
+}ccp_capture_timer_t;
+
 /*
  * @Summary      Defines the values to convert from 16-bit to 8-bit and vice versa
  * @Description  Used to get 8-bit values from 16-bit value also two 8-bit values are combined to get 16-bit value
@@ -89,7 +95,7 @@ typedef union{
         uint16 ccprx_16_bit;
     };
 
-}CCP1_PERIOD_REG_T;
+}CCPx_PERIOD_REG_T;
 
 typedef struct{
     ccpx_inst_t ccpx_inst;
@@ -99,12 +105,15 @@ typedef struct{
     #if CCPx_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
         void (* CCPx_InterruptHandler)(void);
         interrupt_periority_cfg priority;
-    #endif 
+    #endif
+    #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_CAPTURE_MODE_SELECTED
+        ccp_capture_timer_t ccp_capture_timer;
+    #endif    
     #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_PWM_MODE_SELECTED
         uint32 PWM_frequency;
         uint8 timer2_postscaler_value : 4;
         uint8 timer2_prescaler_value : 2;
-    #endif
+    #endif   
 }ccpx_t;
 
 /* Section : Function Declarations */
@@ -112,8 +121,8 @@ Std_ReturnType CCPx_Init(const ccpx_t* _ccp_obj);
 Std_ReturnType CCPx_DeInit(const ccpx_t* _ccp_obj);
 
 #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_CAPTURE_MODE_SELECTED
-    Std_ReturnType CCPx_IsCapturedDataReady(uint8 *_capture_status);
-    Std_ReturnType CCPx_Capture_Mode_Read_Value(uint16 *_captured_value);
+    Std_ReturnType CCPx_IsCapturedDataReady(const ccpx_t* _ccp_obj, uint8 *_capture_status);
+    Std_ReturnType CCPx_Capture_Mode_Read_Value(const ccpx_t* _ccp_obj, uint16 *_captured_value);
 #endif
 
 #if CCPx_CFG_SELECTED_MODE == CCPx_CFG_COMPARE_MODE_SELECTED
