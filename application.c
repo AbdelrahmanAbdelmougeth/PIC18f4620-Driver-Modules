@@ -8,18 +8,36 @@
 
 #include "application.h"
 
-volatile uint32 CCP1_Interrupt_flag;
 volatile uint32 CCP2_Interrupt_flag;
+volatile uint32 Timer3_overflow;
+volatile uint32 Total_period_microseconds;
+volatile uint32 frequuency;
+volatile uint8 second_capture_flag;
 
 timer3_t timer_obj;
 ccpx_t capture1_obj;
 ccpx_t capture2_obj;
 
+
 void Timer3_DefaultInterruptHandler(void){
+    Timer3_overflow++;
 }
+
+volatile uint16 second_capture = 0;
 void CCP1_DefaultInterruptHandler(void){
+    static uint8 CCP1_Interrupt_flag;
+    Std_ReturnType ret = E_NOT_OK;
     CCP1_Interrupt_flag++;
+    second_capture_flag++;
+    if(CCP1_Interrupt_flag == 1){
+        ret = Timer3_Write_Value(&timer_obj, 0);
+    }else if(CCP1_Interrupt_flag == 2){
+        Timer3_overflow = 0;
+        CCP1_Interrupt_flag = 0;
+        ret = Timer3_Read_Value(&timer_obj, &second_capture);
+    }else{/* nothing */}   
 }
+
 void CCP2_DefaultInterruptHandler(void){
     CCP2_Interrupt_flag++;
 }
@@ -32,7 +50,7 @@ int main() {
     capture1_obj.ccpx_inst = CCP1_INST;
     capture1_obj.ccp_capture_timer = CCP1_CCP2_TIMER3;
     capture1_obj.ccpx_mode = CCPx_CAPTURE_MODE_SELECTED;
-    capture1_obj.ccpx_mode_varient = CCPx_CAPTURE_MODE_4_RISING_EDGE;
+    capture1_obj.ccpx_mode_varient = CCPx_CAPTURE_MODE_1_RISING_EDGE;
     capture1_obj.ccpx_pin.port = PORTC_INDEX;
     capture1_obj.ccpx_pin.pin = GPIO_PIN2;
     capture1_obj.ccpx_pin.direction = GPIO_DIRECTION_INPUT;
@@ -57,6 +75,11 @@ int main() {
     Timer3_Init(&timer_obj);
     
     while(1){
+        if(second_capture_flag == 2){
+            second_capture_flag = 0;
+            Total_period_microseconds = (Timer3_overflow * 65535) + second_capture;
+            frequuency = (uint32)(1 / (Total_period_microseconds / 1000000.0));
+        }
     }
     return (EXIT_SUCCESS);
 }
