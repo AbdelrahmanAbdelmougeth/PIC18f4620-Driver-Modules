@@ -8,79 +8,62 @@
 
 #include "application.h"
 
-volatile uint32 CCP2_Interrupt_flag;
-volatile uint32 Timer3_overflow;
-volatile uint32 Total_period_microseconds;
-volatile uint32 frequuency;
-volatile uint8 second_capture_flag;
-
+ccpx_t compare_obj;
+ccpx_t compare2_obj;
 timer3_t timer_obj;
-ccpx_t capture1_obj;
-ccpx_t capture2_obj;
 
 
 void Timer3_DefaultInterruptHandler(void){
-    Timer3_overflow++;
 }
 
-volatile uint16 second_capture = 0;
 void CCP1_DefaultInterruptHandler(void){
-    static uint8 CCP1_Interrupt_flag;
     Std_ReturnType ret = E_NOT_OK;
-    CCP1_Interrupt_flag++;
-    second_capture_flag++;
-    if(CCP1_Interrupt_flag == 1){
-        ret = Timer3_Write_Value(&timer_obj, 0);
-    }else if(CCP1_Interrupt_flag == 2){
-        Timer3_overflow = 0;
-        CCP1_Interrupt_flag = 0;
-        ret = Timer3_Read_Value(&timer_obj, &second_capture);
-    }else{/* nothing */}   
+    ret = Timer3_Write_Value(&timer_obj, 0);
 }
 
 void CCP2_DefaultInterruptHandler(void){
-    CCP2_Interrupt_flag++;
+    Std_ReturnType ret = E_NOT_OK;
+    ret = Timer3_Write_Value(&timer_obj, 0);
 }
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
     application_initialize();
     
-    capture1_obj.CCPx_InterruptHandler = CCP1_DefaultInterruptHandler;
-    capture1_obj.ccpx_inst = CCP1_INST;
-    capture1_obj.ccp_capture_timer = CCP1_CCP2_TIMER3;
-    capture1_obj.ccpx_mode = CCPx_CAPTURE_MODE_SELECTED;
-    capture1_obj.ccpx_mode_varient = CCPx_CAPTURE_MODE_1_RISING_EDGE;
-    capture1_obj.ccpx_pin.port = PORTC_INDEX;
-    capture1_obj.ccpx_pin.pin = GPIO_PIN2;
-    capture1_obj.ccpx_pin.direction = GPIO_DIRECTION_INPUT;
-    ret = CCPx_Init(&capture1_obj);
+    compare_obj.CCPx_InterruptHandler = CCP1_DefaultInterruptHandler;
+    compare_obj.ccpx_inst = CCP1_INST;
+    compare_obj.ccpx_mode = CCPx_COMPARE_MODE_SELECTED;
+    compare_obj.ccpx_mode_varient = CCPx_COMPARE_MODE_TOGGLE_ON_MATCH;
+    compare_obj.ccp_capture_timer = CCP1_CCP2_TIMER3;
+    compare_obj.ccpx_pin.port = PORTC_INDEX;
+    compare_obj.ccpx_pin.pin = GPIO_PIN2;
+    compare_obj.ccpx_pin.direction = GPIO_DIRECTION_OUTPUT;
+    ret = CCPx_Compare_Mode_Write_Value(&compare_obj, (uint16)50000);
+    ret = CCPx_Init(&compare_obj);
     
-    capture2_obj.CCPx_InterruptHandler = CCP2_DefaultInterruptHandler;
-    capture2_obj.ccpx_inst = CCP2_INST;
-    capture2_obj.ccp_capture_timer = CCP1_CCP2_TIMER3;
-    capture2_obj.ccpx_mode = CCPx_CAPTURE_MODE_SELECTED;
-    capture2_obj.ccpx_mode_varient = CCPx_CAPTURE_MODE_16_RISING_EDGE;
-    capture2_obj.ccpx_pin.port = PORTC_INDEX;
-    capture2_obj.ccpx_pin.pin = GPIO_PIN1;
-    capture2_obj.ccpx_pin.direction = GPIO_DIRECTION_INPUT;
-    ret = CCPx_Init(&capture2_obj);
     
-    timer_obj.TMR3_InterruptHandler = Timer3_DefaultInterruptHandler;
+    compare2_obj.CCPx_InterruptHandler = CCP2_DefaultInterruptHandler;
+    compare2_obj.ccpx_inst = CCP2_INST;
+    compare2_obj.ccpx_mode = CCPx_COMPARE_MODE_SELECTED;
+    compare2_obj.ccpx_mode_varient = CCPx_COMPARE_MODE_TOGGLE_ON_MATCH;
+    compare2_obj.ccp_capture_timer = CCP1_CCP2_TIMER3;
+    compare2_obj.ccpx_pin.port = PORTC_INDEX;
+    compare2_obj.ccpx_pin.pin = GPIO_PIN1;
+    compare2_obj.ccpx_pin.direction = GPIO_DIRECTION_OUTPUT;
+    ret = CCPx_Compare_Mode_Write_Value(&compare2_obj, (uint16)50000);
+    ret = CCPx_Init(&compare2_obj);
+    
+    timer_obj.TMR3_InterruptHandler = NULL;
     timer_obj.timer3_mode = TIMER3_TIMER_MODE;
     timer_obj.priority = INTERRUPT_LOW_PRIORITY;
     timer_obj.timer3_prescaler_value = TIMER3_PRESCALER_DIV_BY_1;
     timer_obj.timer3_preload_value = 0;
-    timer_obj.timer3_reg_rw_mode = TIMER3_REG_RW_8BIT_MODE_ENABLED;
+    timer_obj.timer3_reg_rw_mode = TIMER3_REG_RW_16BIT_MODE_ENABLED;
     Timer3_Init(&timer_obj);
     
     while(1){
-        if(second_capture_flag == 2){
-            second_capture_flag = 0;
-            Total_period_microseconds = (Timer3_overflow * 65535) + second_capture;
-            frequuency = (uint32)(1 / (Total_period_microseconds / 1000000.0));
-        }
     }
+    
     return (EXIT_SUCCESS);
 }
 
