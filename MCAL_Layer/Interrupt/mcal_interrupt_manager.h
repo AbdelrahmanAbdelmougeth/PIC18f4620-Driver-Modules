@@ -38,5 +38,8 @@ void TMR3_ISR(void);
 void CCP1_ISR(void);
 void CCP2_ISR(void);
 
+void EUSART_TX_ISR(void);
+void EUSART_RX_ISR(void);
+
 #endif	/* MCAL_INTERRUPT_MANAGER_H */
 

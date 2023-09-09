@@ -46,7 +46,7 @@ Std_ReturnType ADC_Init(const adc_config_t* _adc){
         
         /* Configure the interrupt */
         #if ADC_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
-            ADC_IterruptEnable();
+            ADC_InterruptEnable();
             ADC_InterruptHandler = _adc->ADC_InterruptHandler;
             ADC_IterruptFlagClear();
             #if INTERRUPT_PRIORITY_LEVELS_ENABLE==INTERRUPT_FEATURE_ENABLE
@@ -89,7 +89,7 @@ Std_ReturnType ADC_DeInit(const adc_config_t* _adc){
         ADC_DISABLE();
         /* Configure the interrupt */
         #if ADC_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
-            ADC_IterruptDisable();
+            ADC_InterruptDisable();
         #endif 
     }
     return ret;

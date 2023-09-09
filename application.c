@@ -8,6 +8,59 @@
 
 #include "application.h"
 
+uint8 received_data, sent_data;
+uint32 rx_counter, tx_counter;
+
+
+led_t led1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_LOW};
+led_t led2 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN1, .led_status = GPIO_LOW};
+
+void EUSART_TxDefaultInterruptHandler(void){
+    tx_counter++;
+}
+
+void EUSART_RxDefaultInterruptHandler(void){
+    Std_ReturnType ret = E_NOT_OK;
+    ret = EUSART_ASYNC_RecieveByteNonBlocking(&received_data);
+    rx_counter++;
+    switch (received_data){
+        case 'a' : 
+            led_turn_on(&led1);
+            EUSART_ASYNC_SendStringBlocking("Led1 On\r", 8);
+        break;
+        case 'b' : 
+            led_turn_off(&led1);
+            EUSART_ASYNC_SendStringBlocking("Led1 Off\r", 9);
+        break;
+        case 'c' : 
+            led_turn_on(&led2);
+            EUSART_ASYNC_SendStringBlocking("Led2 On\r", 8);
+        break;
+        case 'd' :
+            led_turn_off(&led2);
+            EUSART_ASYNC_SendStringBlocking("Led2 Off\r", 9);
+        break;
+        default: 
+            led_turn_off(&led1); 
+            led_turn_off(&led2);
+            EUSART_ASYNC_SendStringBlocking("Led1 Off\r", 9);
+            EUSART_ASYNC_SendStringBlocking("Led2 Off\r", 9);
+    }
+}
+
+void EUSART_FramingErrorHandler(void){
+    if(RCSTAbits.FERR == 1){
+        uint8 _data;
+        EUSART_ASYNC_RecieveByteNonBlocking(&_data);
+    } 
+}
+
+void EUSART_OverrunErrorHandler(void){
+    if(RCSTAbits.OERR == 1){
+        EUSART_ASYNC_RX_Restart();      
+    } 
+}
+
 void eusart_module_init(void){
     Std_ReturnType ret = E_NOT_OK;
     eusart_t eusart_obj;
@@ -22,17 +75,14 @@ void eusart_module_init(void){
     eusart_obj.eusart_rx_cfg.eusart_rx_9bit_enable = EUSART_RX_9BIT_DISABLE;
     eusart_obj.eusart_rx_cfg.eusart_rx_interrupt_enable = EUSART_ASYNCHRONOUS_INTERRUPT_RX_ENABLE;
     
-    eusart_obj.EUSART_TxDefaultInterruptHandler = NULL;
-    eusart_obj.EUSART_RxDefaultInterruptHandler = NULL;
-    eusart_obj.EUSART_FramingErrorHandler = NULL;
-    eusart_obj.EUSART_OverrunErrorHandler = NULL;
+    eusart_obj.EUSART_TxDefaultInterruptHandler = EUSART_TxDefaultInterruptHandler;
+    eusart_obj.EUSART_RxDefaultInterruptHandler = EUSART_RxDefaultInterruptHandler;
+    eusart_obj.EUSART_FramingErrorHandler = EUSART_FramingErrorHandler;
+    eusart_obj.EUSART_OverrunErrorHandler = EUSART_OverrunErrorHandler;
     
     ret = EUSART_ASYNC_Init(&eusart_obj);
 }
 
-led_t led1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_LOW};
-
-uint8 received_data;
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
@@ -40,29 +90,9 @@ int main() {
     
     eusart_module_init();
     led_initialize(&led1);
+    led_initialize(&led2);
     
-    while(1){
-//        ret = EUSART_ASYNC_RecieveByteNonBlocking(&received_data);
-//        if(ret = E_OK){
-//            if(received_data == 'o'){
-//                led_turn_on(&led1);
-//                ret = EUSART_ASYNC_SendByteBlocking('y');
-//            }else if(received_data == 'f'){
-//                led_turn_off(&led1);
-//                ret = EUSART_ASYNC_SendByteBlocking('n');
-//            }else{/* nothing */}
-//        }else{/* nothing */}  
-        
-        ret = EUSART_ASYNC_SendByteBlocking('o');
-        ret = EUSART_ASYNC_RecieveByteNonBlocking(&received_data);
-        if(received_data == 'y'){
-           __delay_ms(5000);
-           ret = EUSART_ASYNC_SendByteBlocking('f');
-           __delay_ms(5000);
-        }
-            
-          
-       
+    while(1){  
     }
     
     return (EXIT_SUCCESS);

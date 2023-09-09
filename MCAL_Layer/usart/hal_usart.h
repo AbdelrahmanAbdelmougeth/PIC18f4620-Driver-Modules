@@ -84,14 +84,16 @@ typedef struct{
    uint8 eusart_tx_enable : 1; 
    uint8 eusart_tx_interrupt_enable : 1; 
    uint8 eusart_tx_9bit_enable : 1; 
-   uint8 eusart_tx_reserved : 5; 
+   interrupt_periority_cfg tx_priority;
+   uint8 eusart_tx_reserved : 4;
 }eusart_tx_cfg_t;
 
 typedef struct{
    uint8 eusart_rx_enable : 1;
    uint8 eusart_rx_interrupt_enable : 1; 
    uint8 eusart_rx_9bit_enable : 1;
-   uint8 eusart_rx_reservered : 5;
+   interrupt_periority_cfg rx_priority;
+   uint8 eusart_rx_reservered : 4;
 }eusart_rx_cfg_t;
 
 typedef union{
@@ -104,23 +106,30 @@ typedef union{
 }eusart_error_status_t;
 
 typedef struct{
+    #if EUSART_TX_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
+        void (* EUSART_TxDefaultInterruptHandler)(void);
+    #endif
+    #if EUSART_RX_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
+        void (* EUSART_RxDefaultInterruptHandler)(void); 
+        void (* EUSART_FramingErrorHandler)(void); 
+        void (* EUSART_OverrunErrorHandler)(void); 
+    #endif
     uint32 baudrate;
     uint8 eusart_mode : 1;             /* SYNCHRONOUS or ASYNCHRONOUS Mode */           
     baudrate_gen_t baudrate_config;
     eusart_tx_cfg_t  eusart_tx_cfg;
     eusart_rx_cfg_t  eusart_rx_cfg;
     eusart_error_status_t eusart_error_status;
-    void (* EUSART_TxDefaultInterruptHandler)(void); 
-    void (* EUSART_RxDefaultInterruptHandler)(void); 
-    void (* EUSART_FramingErrorHandler)(void); 
-    void (* EUSART_OverrunErrorHandler)(void); 
 }eusart_t;
 
 /* Section : Function Declarations */
 Std_ReturnType EUSART_ASYNC_Init(eusart_t *_eusart);
 Std_ReturnType EUSART_ASYNC_DeInit(eusart_t *_eusart);
+Std_ReturnType EUSART_ASYNC_RX_Restart(void);
 Std_ReturnType EUSART_ASYNC_SendByteBlocking(uint8 _data);
 Std_ReturnType EUSART_ASYNC_SendStringBlocking(uint8 *_str, uint16 _str_len);
+Std_ReturnType EUSART_ASYNC_SendByteNonBlocking(uint8 _data);
+Std_ReturnType EUSART_ASYNC_SendStringNonBlocking(uint8 *_str, uint16 _str_len);
 Std_ReturnType EUSART_ASYNC_RecieveByteBlocking(uint8 *_data);
 Std_ReturnType EUSART_ASYNC_RecieveByteNonBlocking(uint8 *_data);
 

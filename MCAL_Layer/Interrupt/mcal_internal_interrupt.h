@@ -15,9 +15,9 @@
 /* Section : Macro Declarations */
 #if ADC_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
     /*This Macro Will Enable The Internal ADC Interrupt*/
-    #define ADC_IterruptEnable()      (PIE1bits.ADIE = 1)
+    #define ADC_InterruptEnable()      (PIE1bits.ADIE = 1)
     /*This Macro Will Disable The Internal ADC Interrupt*/
-    #define ADC_IterruptDisable()     (PIE1bits.ADIE = 0)
+    #define ADC_InterruptDisable()     (PIE1bits.ADIE = 0)
     /*This Macro Will Clear The Internal ADC Flag Bit*/
     #define ADC_IterruptFlagClear()   (PIR1bits.ADIF = 0)
     #if INTERRUPT_PRIORITY_LEVELS_ENABLE==INTERRUPT_FEATURE_ENABLE
@@ -25,6 +25,36 @@
         #define ADC_INTERRUPT_HighPrioritySet() (IPR1bits.ADIP = 1)
         /*This Macro will set the Internal ADC Interrupt priority to be low*/
         #define ADC_INTERRUPT_LowPrioritySet()  (IPR1bits.ADIP = 0)
+    #endif
+
+#endif 
+
+
+#if EUSART_TX_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
+    /*This Macro Will Enable The Internal EUSART_TX Interrupt*/
+    #define EUSART_TX_InterruptEnable()      (PIE1bits.TXIE = 1)
+    /*This Macro Will Disable The Internal EUSART_TX Interrupt*/
+    #define EUSART_TX_InterruptDisable()     (PIE1bits.TXIE = 0)
+    #if INTERRUPT_PRIORITY_LEVELS_ENABLE==INTERRUPT_FEATURE_ENABLE
+        /*This Macro will set the Internal EUSART_TX Interrupt priority to be high*/
+        #define EUSART_TX_INTERRUPT_HighPrioritySet() (IPR1bits.TXIP = 1)
+        /*This Macro will set the Internal EUSART_TX Interrupt priority to be low*/
+        #define EUSART_TX_INTERRUPT_LowPrioritySet()  (IPR1bits.TXIP = 0)
+    #endif
+
+#endif 
+
+
+#if EUSART_RX_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
+    /*This Macro Will Enable The Internal EUSART_RX Interrupt*/
+    #define EUSART_RX_InterruptEnable()      (PIE1bits.RCIE = 1)
+    /*This Macro Will Disable The Internal EUSART_RX Interrupt*/
+    #define EUSART_RX_InterruptDisable()     (PIE1bits.RCIE = 0)
+    #if INTERRUPT_PRIORITY_LEVELS_ENABLE==INTERRUPT_FEATURE_ENABLE
+        /*This Macro will set the Internal EUSART_RX Interrupt priority to be high*/
+        #define EUSART_RX_INTERRUPT_HighPrioritySet() (IPR1bits.RCIP = 1)
+        /*This Macro will set the Internal EUSART_RX Interrupt priority to be low*/
+        #define EUSART_RX_INTERRUPT_LowPrioritySet()  (IPR1bits.RCIP = 0)
     #endif
 
 #endif 
