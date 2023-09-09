@@ -10,10 +10,10 @@
 
 /* Section : Includes */
 #include "hal_adc_cfg.h"
-#include "GPIO/hal_gpio.h"
+#include "../GPIO/hal_gpio.h"
 #include "../include/proc/pic18f4620.h"
-#include "../MCAL_Layer/mcal_std_types.h"
-#include "../MCAL_Layer/Interrupt/mcal_internal_interrupt.h"
+#include "../mcal_std_types.h"
+#include "../Interrupt/mcal_internal_interrupt.h"
 
 
 /* Section : Macro Declarations */
