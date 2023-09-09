@@ -8,58 +8,46 @@
 
 #include "application.h"
 
-ccpx_t compare_obj;
-timer3_t timer_obj;
-
-volatile uint8 signal_high_flag = 0;
-
-void Timer3_DefaultInterruptHandler(void){
-}
-
-void CCP1_DefaultInterruptHandler(void){
+void eusart_module_init(void){
     Std_ReturnType ret = E_NOT_OK;
+    eusart_t eusart_obj;
+    eusart_obj.baudrate = 9600;
+    eusart_obj.baudrate_config = BAUDRATE_ASYNC_8BIT_LOW_SPEED;
     
-    ret = Timer3_Write_Value(&timer_obj, 0);
+    eusart_obj.eusart_tx_cfg.eusart_tx_enable = EUSART_ASYNCHRONOUS_TX_ENABLE;
+    eusart_obj.eusart_tx_cfg.eusart_tx_9bit_enable = EUSART_TX_9BIT_DISABLE;
+    eusart_obj.eusart_tx_cfg.eusart_tx_interrupt_enable = EUSART_ASYNCHRONOUS_INTERRUPT_TX_ENABLE;
     
-    if(signal_high_flag == 1){
-        signal_high_flag = 0;
-        ret = CCPx_Compare_Mode_Write_Value(&compare_obj, (uint16)12500);
-        CCP1_SET_MODE(CCPx_COMPARE_MODE_SET_PIN_HIGH);
-    }else if(signal_high_flag == 0){
-        signal_high_flag = 1;
-        ret = CCPx_Compare_Mode_Write_Value(&compare_obj, (uint16)37500);
-        CCP1_SET_MODE(CCPx_COMPARE_MODE_SET_PIN_LOW);
-    }
+    eusart_obj.eusart_rx_cfg.eusart_rx_enable = EUSART_ASYNCHRONOUS_RX_ENABLE;
+    eusart_obj.eusart_rx_cfg.eusart_rx_9bit_enable = EUSART_RX_9BIT_DISABLE;
+    eusart_obj.eusart_rx_cfg.eusart_rx_interrupt_enable = EUSART_ASYNCHRONOUS_INTERRUPT_RX_ENABLE;
+    
+    eusart_obj.EUSART_TxDefaultInterruptHandler = NULL;
+    eusart_obj.EUSART_RxDefaultInterruptHandler = NULL;
+    eusart_obj.EUSART_FramingErrorHandler = NULL;
+    eusart_obj.EUSART_OverrunErrorHandler = NULL;
+    
+    ret = EUSART_ASYNC_Init(&eusart_obj);
 }
 
-void CCP2_DefaultInterruptHandler(void){
-}
+led_t led1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_LOW};
+
+uint8 received_data;
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
     application_initialize();
     
-    compare_obj.CCPx_InterruptHandler = CCP1_DefaultInterruptHandler;
-    compare_obj.ccpx_inst = CCP1_INST;
-    compare_obj.ccpx_mode = CCPx_COMPARE_MODE_SELECTED;
-    compare_obj.ccpx_mode_varient = CCPx_COMPARE_MODE_SET_PIN_LOW;
-    compare_obj.ccp_capture_timer = CCP1_CCP2_TIMER3;
-    compare_obj.ccpx_pin.port = PORTC_INDEX;
-    compare_obj.ccpx_pin.pin = GPIO_PIN2;
-    compare_obj.ccpx_pin.direction = GPIO_DIRECTION_OUTPUT;
-    
-    ret = CCPx_Compare_Mode_Write_Value(&compare_obj, (uint16)37500);
-    ret = CCPx_Init(&compare_obj);
-    
-    timer_obj.TMR3_InterruptHandler = NULL;
-    timer_obj.timer3_mode = TIMER3_TIMER_MODE;
-    timer_obj.priority = INTERRUPT_LOW_PRIORITY;
-    timer_obj.timer3_prescaler_value = TIMER3_PRESCALER_DIV_BY_1;
-    timer_obj.timer3_preload_value = 0;
-    timer_obj.timer3_reg_rw_mode = TIMER3_REG_RW_16BIT_MODE_ENABLED;
-    Timer3_Init(&timer_obj);
+    eusart_module_init();
+    led_initialize(&led1);
     
     while(1){
+        ret = EUSART_ASYNC_RecieveByteBlocking(&received_data);
+        if(received_data == 'o'){
+            led_turn_on(&led1);
+        }else if(received_data == 'f'){
+            led_turn_off(&led1);        
+        }else{/* nothing */}
     }
     
     return (EXIT_SUCCESS);
