@@ -122,6 +122,7 @@ Std_ReturnType EUSART_ASYNC_DeInit(eusart_t *_eusart);
 Std_ReturnType EUSART_ASYNC_SendByteBlocking(uint8 _data);
 Std_ReturnType EUSART_ASYNC_SendStringBlocking(uint8 *_str, uint16 _str_len);
 Std_ReturnType EUSART_ASYNC_RecieveByteBlocking(uint8 *_data);
+Std_ReturnType EUSART_ASYNC_RecieveByteNonBlocking(uint8 *_data);
 
 #endif	/* HAL_USART_H */
 

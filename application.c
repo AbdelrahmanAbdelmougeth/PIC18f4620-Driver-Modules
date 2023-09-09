@@ -42,12 +42,27 @@ int main() {
     led_initialize(&led1);
     
     while(1){
-        ret = EUSART_ASYNC_RecieveByteBlocking(&received_data);
-        if(received_data == 'o'){
-            led_turn_on(&led1);
-        }else if(received_data == 'f'){
-            led_turn_off(&led1);        
-        }else{/* nothing */}
+//        ret = EUSART_ASYNC_RecieveByteNonBlocking(&received_data);
+//        if(ret = E_OK){
+//            if(received_data == 'o'){
+//                led_turn_on(&led1);
+//                ret = EUSART_ASYNC_SendByteBlocking('y');
+//            }else if(received_data == 'f'){
+//                led_turn_off(&led1);
+//                ret = EUSART_ASYNC_SendByteBlocking('n');
+//            }else{/* nothing */}
+//        }else{/* nothing */}  
+        
+        ret = EUSART_ASYNC_SendByteBlocking('o');
+        ret = EUSART_ASYNC_RecieveByteNonBlocking(&received_data);
+        if(received_data == 'y'){
+           __delay_ms(5000);
+           ret = EUSART_ASYNC_SendByteBlocking('f');
+           __delay_ms(5000);
+        }
+            
+          
+       
     }
     
     return (EXIT_SUCCESS);

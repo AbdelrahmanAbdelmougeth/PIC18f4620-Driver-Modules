@@ -37,7 +37,7 @@ Std_ReturnType EUSART_ASYNC_DeInit(eusart_t *_eusart){
     if(_eusart == NULL){
         ret = E_NOT_OK;
     }else{
-        
+        EUSART_MODULE_DISABLE();
     }
     return ret;
 }
@@ -65,6 +65,20 @@ Std_ReturnType EUSART_ASYNC_RecieveByteBlocking(uint8 *_data){
     }else{
         while(!PIR1bits.RCIF);
         *_data = RCREG;
+    }
+    return ret;
+}
+
+Std_ReturnType EUSART_ASYNC_RecieveByteNonBlocking(uint8 *_data){
+    Std_ReturnType ret = E_OK;
+    if(_data == NULL){
+        ret = E_NOT_OK;
+    }else{
+        if(PIR1bits.RCIF){
+            *_data = RCREG;
+        }else{
+            ret = E_NOT_OK;
+        }       
     }
     return ret;
 }
