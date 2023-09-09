@@ -1,17 +1,16 @@
 /* 
- * File:   device_config.h
- * Author: abdo9
+ * File:   hal_usart_cfg.h
+ * Author: hp
  *
- * Created on May 15, 2023, 1:44 PM
+ * Created on 07 ??????, 2023, 06:27 ?
  */
 
-#ifndef DEVICE_CONFIG_H
-#define	DEVICE_CONFIG_H
+#ifndef HAL_USART_CFG_H
+#define	HAL_USART_CFG_H
 
 /* Section : Includes */
 
 /* Section : Macro Declarations */
-#define _XTAL_FREQ 8000000UL
 
 /* Section : Macro Functions Declarations */
 
@@ -19,5 +18,5 @@
 
 /* Section : Function Declarations */
 
-#endif	/* DEVICE_CONFIG_H */
+#endif	/* HAL_USART_CFG_H */
 
