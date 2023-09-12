@@ -11,13 +11,31 @@
 mssp_i2c_t i2c_obj;
 
 #define _slave1 0x60
-#define _slave2 0x61
+#define _slave2 0x62
 
 volatile uint8 i2c_slave1_rec_counter;
+static volatile uint8 i2c_slave1_rec_data;
 
 void MSSP_I2C_DefaultInterruptHandler(){
+    /* Stretch SCK To force the master to stay idle and don't send any data */
+    /* Stretch Enable bit : Clock stretching is enabled for both slave transmit and slave receive */
+    I2C_CLOCK_STRETCH_ENABLE();
+    /* Check If The Master Needs To Read/Write and the last received byte wasn't an address*/
+    if(SSPSTATbits.R_nW == 0 && SSPSTATbits.D_nA == 0){
+        uint8 dummy_buffer = SSPBUF;  /* read the last byte to clear the buffer */
+        while(!I2C_GET_SSPBUF_STATUS()); /* wait for the data to be completely received */
+        i2c_slave1_rec_data = SSPBUF; /* read the data */
+    }else if(SSPSTATbits.R_nW = 1){
+        
+    }else{ /* nothing */ }
+    
+    /* SCK Stretch disable */
+    I2C_CLOCK_STRETCH_DISABLE();
+    
     i2c_slave1_rec_counter++;
 }
+
+led_t led1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_LOW};
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
@@ -33,8 +51,14 @@ int main() {
     i2c_obj.I2C_Report_Receive_Overflow = NULL;
     i2c_obj.I2C_Report_Write_Collision = NULL;
     ret = MSSP_I2C_Init(&i2c_obj);
+    led_initialize(&led1);
     
     while(1){  
+        if(i2c_slave1_rec_data == 'a'){
+            led_turn_on(&led1);
+        }else if(i2c_slave1_rec_data == 'c'){
+            led_turn_off(&led1);
+        } 
     }
     
     return (EXIT_SUCCESS);

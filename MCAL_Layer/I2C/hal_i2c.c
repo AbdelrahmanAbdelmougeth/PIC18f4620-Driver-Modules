@@ -197,25 +197,29 @@ Std_ReturnType MSSP_I2C_Read(const mssp_i2c_t *_i2c_obj, uint8 _ack, uint8 *_i2c
 }
 
 void MSSP_I2C_ISR(void){
-    /* The Internal MSSP_I2C Interrupt has been occurred (must be cleared in software) */ 
-    MSSP_I2C_IterruptFlagClear();
-    /* Code : To be executed from MCAL Interrupt Context*/
-    
-    /* Callback function gets called every time this ISR executes*/
-    if(MSSP_I2C_InterruptHandler){
-        MSSP_I2C_InterruptHandler();
-    }
+    #if MSSP_I2C_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
+        /* The Internal MSSP_I2C Interrupt has been occurred (must be cleared in software) */ 
+        MSSP_I2C_IterruptFlagClear();
+        /* Code : To be executed from MCAL Interrupt Context*/
+
+        /* Callback function gets called every time this ISR executes*/
+        if(MSSP_I2C_InterruptHandler){
+            MSSP_I2C_InterruptHandler();
+        }
+    #endif
 }
 
 void MSSP_I2C_BC_ISR(void){
-    /* The Internal MSSP I2C Bus Collision Interrupt has been occurred (must be cleared in software) */ 
-    MSSP_I2C_BUS_COL_IterruptFlagClear();
-    /* Code : To be executed from MCAL Interrupt Context*/
-    
-    /* Callback function gets called every time this ISR executes*/
-    if(MSSP_I2C_Report_Write_Collision){
-        MSSP_I2C_Report_Write_Collision();
-    }
+    #if MSSP_I2C_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
+        /* The Internal MSSP I2C Bus Collision Interrupt has been occurred (must be cleared in software) */ 
+        MSSP_I2C_BUS_COL_IterruptFlagClear();
+        /* Code : To be executed from MCAL Interrupt Context*/
+
+        /* Callback function gets called every time this ISR executes*/
+        if(MSSP_I2C_Report_Write_Collision){
+            MSSP_I2C_Report_Write_Collision();
+        }
+    #endif    
 }
 
 

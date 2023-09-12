@@ -126,6 +126,9 @@
 #define I2C_SLAVE_ADDRESS_ASSIGN(_ADD) (SSPADD = _ADD)
 
 
+#define I2C_CLOCK_STRETCH_ENABLE()      (SSPCON1bits.CKP = 0)
+#define I2C_CLOCK_STRETCH_DISABLE()     (SSPCON1bits.CKP = 1)
+
 /* Section : Data-Type Declarations */
 typedef struct{
     uint8 i2c_mode_cfg;                 /* SSPM3:SSPM0: Master Synchronous Serial Port Mode Select */
