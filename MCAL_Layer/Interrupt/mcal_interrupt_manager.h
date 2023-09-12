@@ -41,5 +41,8 @@ void CCP2_ISR(void);
 void EUSART_TX_ISR(void);
 void EUSART_RX_ISR(void);
 
+void MSSP_I2C_ISR(void);
+void MSSP_I2C_BC_ISR(void);
+
 #endif	/* MCAL_INTERRUPT_MANAGER_H */
 

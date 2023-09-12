@@ -111,6 +111,7 @@ Std_ReturnType EUSART_ASYNC_SendStringNonBlocking(uint8 *_str, uint16 _str_len){
             char_counter++;     
        }
     }
+    return ret;
 }
 
 

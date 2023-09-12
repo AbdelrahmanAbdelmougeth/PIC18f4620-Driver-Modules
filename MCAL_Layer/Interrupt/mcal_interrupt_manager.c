@@ -136,5 +136,17 @@ void __interrupt() InterruptManager(void){
         EUSART_RX_ISR();
     }
     else{/*nothing*/}
+    
+    /* MSSP_I2C Interrupt */
+    if((PIE1bits.SSPIE == INTERRUPT_ENABLE) && (PIR1bits.SSPIF == INTERRUPT_OCCUR)){
+        MSSP_I2C_ISR();
+    }
+    else{/*nothing*/}
+    
+    /* MSSP_I2C Bus Collision Interrupt */
+    if((PIE2bits.BCLIE == INTERRUPT_ENABLE) && (PIR2bits.BCLIF == INTERRUPT_OCCUR)){
+        MSSP_I2C_BC_ISR();
+    }
+    else{/*nothing*/}
 }
 #endif
