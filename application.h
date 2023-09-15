@@ -20,7 +20,8 @@
 //#include "MCAL_Layer/Timer3/hal_timer3.h"
 //#include "MCAL_Layer/CCP1/hal_ccpx.h"
 //#include "MCAL_Layer/usart/hal_usart.h"
-#include "MCAL_Layer/I2C/hal_i2c.h"
+//#include "MCAL_Layer/I2C/hal_i2c.h"
+#include "MCAL_Layer/SPI/hal_spi.h"
 
 /* Section : Macro Declarations */
 

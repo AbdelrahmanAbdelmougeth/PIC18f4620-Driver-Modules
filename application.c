@@ -8,57 +8,52 @@
 
 #include "application.h"
 
-mssp_i2c_t i2c_obj;
-
-#define _slave1 0x60
-#define _slave2 0x62
-
-volatile uint8 i2c_slave2_rec_counter;
-static volatile uint8 i2c_slave2_rec_data;
-
-void MSSP_I2C_DefaultInterruptHandler(){
-    /* Stretch SCK To force the master to stay idle and don't send any data */
-    /* Stretch Enable bit : Clock stretching is enabled for both slave transmit and slave receive */
-    I2C_CLOCK_STRETCH_ENABLE();
-    /* Check If The Master Needs To Read/Write and the last received byte wasn't an address*/
-    if(SSPSTATbits.R_nW == 0 && SSPSTATbits.D_nA == 0){
-        uint8 dummy_buffer = SSPBUF;  /* read the last byte to clear the buffer */
-        while(!I2C_GET_SSPBUF_STATUS()); /* wait for the data to be completely received */
-        i2c_slave2_rec_data = SSPBUF; /* read the data */
-    }else if(SSPSTATbits.R_nW = 1){
-        
-    }else{ /* nothing */ }
-    
-    /* SCK Stretch disable */
-    I2C_CLOCK_STRETCH_DISABLE();
-    
-    i2c_slave2_rec_counter++;
+void MSSP_SPI_DefaultInterruptHandler(){
 }
 
-led_t led1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_LOW};
+spi_t spi_master_obj = {
+    .spi_mode = SPI_MASTER_MODE_FOSC_DIV_4,
+    .spi_config.ClockPolarity = CLOCK_POLARITY_IDLE_IS_LOW,
+    .spi_config.ClockSelect = TRANSMIT_FROM_IDLE_TO_ACTIVE,
+    .spi_config.SampleSelect = SAMPLE_INPUT_DATA_AT_MID,
+    #if MSSP_SPI_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
+        .MSSP_SPI_InterruptHandler = MSSP_SPI_DefaultInterruptHandler,
+        .priority = INTERRUPT_LOW_PRIORITY,
+    #endif
+};
+
+led_t SPI_SS1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_HIGH};
+led_t SPI_SS2 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN1, .led_status = GPIO_HIGH};
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
     application_initialize();
     
-    i2c_obj.i2c_cfg.i2c_mode = MSSP_I2C_SLAVE_MODE;
-    i2c_obj.i2c_cfg.i2c_mode_cfg = I2C_SLAVE_MODE_7_BIT_ADDRESS;
-    i2c_obj.i2c_cfg.i2c_SMBus_control = I2C_SMBus_DISABLED;
-    i2c_obj.i2c_cfg.i2c_slave_add = _slave2;
-    i2c_obj.i2c_cfg.i2c_slew_rate = I2C_SLEW_RATE_DISABLED;
-    i2c_obj.i2c_cfg.i2c_general_call = I2C_GENERAL_CALL_DISABLED;
-    i2c_obj.I2C_DefaultInterruptHandler = MSSP_I2C_DefaultInterruptHandler;
-    i2c_obj.I2C_Report_Receive_Overflow = NULL;
-    i2c_obj.I2C_Report_Write_Collision = NULL;
-    ret = MSSP_I2C_Init(&i2c_obj);
-    led_initialize(&led1);
+    ret = SPI_Init(&spi_master_obj);
+    ret = led_initialize(&SPI_SS1);
+    ret = led_initialize(&SPI_SS2);
     
-    while(1){  
-        if(i2c_slave2_rec_data == 'b'){
-            led_turn_on(&led1);
-        }else if(i2c_slave2_rec_data == 'd'){
-            led_turn_off(&led1);
-        } 
+    while(1){
+        ret = led_turn_off(&SPI_SS1);
+        ret = SPI_Send_Byte_Blocking(&spi_master_obj, 'a');   
+        ret = led_turn_on(&SPI_SS1);
+        __delay_ms(500);
+        
+        ret = led_turn_off(&SPI_SS2);
+        ret = SPI_Send_Byte_Blocking(&spi_master_obj, 'b');
+        ret = led_turn_on(&SPI_SS2);
+        __delay_ms(500);
+        
+        ret = led_turn_off(&SPI_SS1);
+        ret = SPI_Send_Byte_Blocking(&spi_master_obj, 'c');   
+        ret = led_turn_on(&SPI_SS1);
+        __delay_ms(500);
+        
+        ret = led_turn_off(&SPI_SS2);
+        ret = SPI_Send_Byte_Blocking(&spi_master_obj, 'd');
+        ret = led_turn_on(&SPI_SS2);
+        __delay_ms(500);
+        
     }
     
     return (EXIT_SUCCESS);
