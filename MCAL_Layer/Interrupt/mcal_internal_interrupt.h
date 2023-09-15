@@ -35,6 +35,23 @@
 #endif 
 
 
+#if MSSP_SPI_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
+    /*This Macro Will Enable The Internal MSSP_SPI Interrupt*/
+    #define MSSP_SPI_InterruptEnable()           (PIE1bits.SSPIE = 1)
+    /*This Macro Will Disable The Internal MSSP_SPI Interrupt*/
+    #define MSSP_SPI_InterruptDisable()          (PIE1bits.SSPIE = 0)
+    /*This Macro Will Clear The Internal MSSP_SPI Flag Bit*/
+    #define MSSP_SPI_IterruptFlagClear()         (PIR1bits.SSPIF = 0)
+    #if INTERRUPT_PRIORITY_LEVELS_ENABLE==INTERRUPT_FEATURE_ENABLE
+        /*This Macro will set the Internal MSSP_SPI Interrupt priority to be high*/
+        #define MSSP_SPI_INTERRUPT_HighPrioritySet()         (IPR1bits.SSPIP = 1)
+        /*This Macro will set the Internal MSSP_SPI Interrupt priority to be low*/
+        #define MSSP_SPI_INTERRUPT_LowPrioritySet()          (IPR1bits.SSPIP = 0)
+    #endif
+
+#endif 
+
+
 #if ADC_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
     /*This Macro Will Enable The Internal ADC Interrupt*/
     #define ADC_InterruptEnable()      (PIE1bits.ADIE = 1)

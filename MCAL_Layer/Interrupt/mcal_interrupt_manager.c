@@ -137,6 +137,7 @@ void __interrupt() InterruptManager(void){
     }
     else{/*nothing*/}
     
+#if MSSP_I2C_INTERRUPT_FEATURE_ENABLE == INTERRUPT_FEATURE_ENABLE
     /* MSSP_I2C Interrupt */
     if((PIE1bits.SSPIE == INTERRUPT_ENABLE) && (PIR1bits.SSPIF == INTERRUPT_OCCUR)){
         MSSP_I2C_ISR();
@@ -146,6 +147,13 @@ void __interrupt() InterruptManager(void){
     /* MSSP_I2C Bus Collision Interrupt */
     if((PIE2bits.BCLIE == INTERRUPT_ENABLE) && (PIR2bits.BCLIF == INTERRUPT_OCCUR)){
         MSSP_I2C_BC_ISR();
+    }
+    else{/*nothing*/}
+#endif  
+    
+    /* MSSP_I2C Interrupt */
+    if((PIE1bits.SSPIE == INTERRUPT_ENABLE) && (PIR1bits.SSPIF == INTERRUPT_OCCUR)){
+        MSSP_SPI_ISR();
     }
     else{/*nothing*/}
 }
