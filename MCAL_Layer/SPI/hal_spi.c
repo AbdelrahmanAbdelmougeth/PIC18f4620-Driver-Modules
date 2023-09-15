@@ -99,7 +99,6 @@ Std_ReturnType SPI_Read_Byte_Blocking(const spi_t *_spi_obj, uint8 *_data){
     if(_spi_obj == NULL || _data == NULL){
         ret = E_NOT_OK;
     }else{
-        SSPBUF_WRITE_REG(_data);
         while(SSPSTATbits.BF == 0); /* Receive not complete, SSPBUF is empty */
         *_data = SSPBUF;   
     }

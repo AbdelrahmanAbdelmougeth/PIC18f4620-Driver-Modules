@@ -8,11 +8,13 @@
 
 #include "application.h"
 
+uint8 receved_data;
+
 void MSSP_SPI_DefaultInterruptHandler(){
 }
 
-spi_t spi_master_obj = {
-    .spi_mode = SPI_MASTER_MODE_FOSC_DIV_4,
+spi_t spi_slave1_obj = {
+    .spi_mode = SPI_SLAVE_MODE_SS_ENABLED,
     .spi_config.ClockPolarity = CLOCK_POLARITY_IDLE_IS_LOW,
     .spi_config.ClockSelect = TRANSMIT_FROM_IDLE_TO_ACTIVE,
     .spi_config.SampleSelect = SAMPLE_INPUT_DATA_AT_MID,
@@ -22,38 +24,22 @@ spi_t spi_master_obj = {
     #endif
 };
 
-led_t SPI_SS1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_HIGH};
-led_t SPI_SS2 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN1, .led_status = GPIO_HIGH};
+led_t led1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_LOW};
 
 int main() {
     Std_ReturnType ret = E_NOT_OK;
     application_initialize();
     
-    ret = SPI_Init(&spi_master_obj);
-    ret = led_initialize(&SPI_SS1);
-    ret = led_initialize(&SPI_SS2);
+    ret = SPI_Init(&spi_slave1_obj);
+    ret = led_initialize(&led1);
     
     while(1){
-        ret = led_turn_off(&SPI_SS1);
-        ret = SPI_Send_Byte_Blocking(&spi_master_obj, 'a');   
-        ret = led_turn_on(&SPI_SS1);
-        __delay_ms(500);
-        
-        ret = led_turn_off(&SPI_SS2);
-        ret = SPI_Send_Byte_Blocking(&spi_master_obj, 'b');
-        ret = led_turn_on(&SPI_SS2);
-        __delay_ms(500);
-        
-        ret = led_turn_off(&SPI_SS1);
-        ret = SPI_Send_Byte_Blocking(&spi_master_obj, 'c');   
-        ret = led_turn_on(&SPI_SS1);
-        __delay_ms(500);
-        
-        ret = led_turn_off(&SPI_SS2);
-        ret = SPI_Send_Byte_Blocking(&spi_master_obj, 'd');
-        ret = led_turn_on(&SPI_SS2);
-        __delay_ms(500);
-        
+        ret = SPI_Read_Byte_Blocking(&spi_slave1_obj, &receved_data);
+        if(receved_data == 'a'){
+            led_turn_on(&led1);
+        }else if(receved_data == 'c'){
+            led_turn_off(&led1);
+        }
     }
     
     return (EXIT_SUCCESS);
