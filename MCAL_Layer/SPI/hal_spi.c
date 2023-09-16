@@ -110,7 +110,7 @@ Std_ReturnType SPI_Send_Byte_NonBlocking(const spi_t *_spi_obj, const uint8 _dat
     if(_spi_obj == NULL){
         ret = E_NOT_OK;
     }else{
-       
+       SSPBUF_WRITE_REG(_data);
     }
     return ret;
 }
@@ -119,8 +119,12 @@ Std_ReturnType SPI_Read_Byte_NonBlocking(const spi_t *_spi_obj, uint8 *_data){
     Std_ReturnType ret = E_OK;
     if(_spi_obj == NULL || _data == NULL){
         ret = E_NOT_OK;
-    }else{
-       
+    }else{ 
+        if(GET_SSPBUF_STATE()){
+            *_data = SSPBUF;
+        }else if(GET_SSPBUF_STATE()){
+            ret = E_NOT_OK;
+        } 
     }
     return ret;
 }
