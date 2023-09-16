@@ -11,7 +11,7 @@
 volatile uint8 receveid_data;
 void MSSP_SPI_DefaultInterruptHandler();
 
-spi_t spi_slave1_obj = {
+spi_t spi_slave2_obj = {
     .spi_mode = SPI_SLAVE_MODE_SS_ENABLED,
     .spi_config.ClockPolarity = CLOCK_POLARITY_IDLE_IS_LOW,
     .spi_config.ClockSelect = TRANSMIT_FROM_IDLE_TO_ACTIVE,
@@ -23,7 +23,7 @@ spi_t spi_slave1_obj = {
 };
 
 void MSSP_SPI_DefaultInterruptHandler(){
-    SPI_Send_Byte_NonBlocking(&spi_slave1_obj, &receveid_data);
+    SPI_Send_Byte_NonBlocking(&spi_slave2_obj, &receveid_data);
 }
 
 led_t led1 = {.port_name = PORTD_INDEX, .pin = GPIO_PIN0, .led_status = GPIO_LOW};
@@ -32,13 +32,13 @@ int main() {
     Std_ReturnType ret = E_NOT_OK;
     application_initialize();
     
-    ret = SPI_Init(&spi_slave1_obj);
+    ret = SPI_Init(&spi_slave2_obj);
     ret = led_initialize(&led1);
     
     while(1){
-        if(receveid_data == 'a'){
+        if(receveid_data == 'b'){
             led_turn_on(&led1);
-        }else if(receveid_data == 'c'){
+        }else if(receveid_data == 'd'){
             led_turn_off(&led1);
         }
     }
